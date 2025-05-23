@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "132855806415",
+    "firebase_url": "https://yourlibrarypalazova-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "yourlibrarypalazova",
+    "storage_bucket": "yourlibrarypalazova.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:132855806415:android:0b57d6229ec4eb43f6faba",
+        "android_client_info": {
+          "package_name": "com.example.yourlibrary_palazova"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "132855806415-bdv0lissugs7u6kr99i66vl970iavt24.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.yourlibrary_palazova",
+            "certificate_hash": "02e7dbc9d3c62b368d96e2a3b90c355b93929635"
+          }
+        },
+        {
+          "client_id": "132855806415-snjraes15k0jj5ar8v6bb8rcqriu2col.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAi32gALOPDQOaGjjulTzat1KDt8aBNphU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "132855806415-snjraes15k0jj5ar8v6bb8rcqriu2col.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

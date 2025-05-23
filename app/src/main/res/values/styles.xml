@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Стиль для прозрачного BottomSheet -->
+    <style name="TransparentBottomSheetTheme" parent="Theme.Design.Light.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/TransparentBottomSheetStyle</item>
+    </style>
+
+    <style name="TransparentBottomSheetStyle" parent="Widget.Design.BottomSheet.Modal">
+        <item name="android:background">@android:color/transparent</item>
+    </style>
+
+    <style name="CustomDialogStyle" parent="Theme.Material3.DayNight.Dialog.Alert">
+        <item name="android:background">@drawable/rounded_background</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:textColorPrimary">#241203</item>
+        <item name="fontFamily">@font/oswald_medium</item>
+        <item name="android:layout_gravity">center</item>
+        <item name="textAllCaps">false</item>
+    </style>
+
+    <style name="ThemeOverlay.App.DatePicker" parent="ThemeOverlay.Material3.MaterialCalendar">
+        <item name="colorPrimary">#639068</item>
+        <item name="materialCalendarHeaderTitle">@style/CalendarHeaderTitle</item>
+    </style>
+    <style name="CalendarHeaderTitle" parent="Widget.Material3.MaterialCalendar.HeaderTitle">
+        <item name="android:textColor">#241203</item>
+        <item name="android:fontFamily">@font/oswald_medium</item>
+    </style>
+
+    <style name="PopupMenuStyle" parent="Widget.AppCompat.PopupMenu">
+        <item name="android:textColor">#241203</item> <!-- цвет текста -->
+        <item name="android:fontFamily">@font/oswald_medium</item>     <!-- размер текста -->
+        <item name="android:background">@drawable/rounded_background</item>
+    </style>
+
+    <style name="ThemeOverlay.App.FilterDialog" parent="ThemeOverlay.Material3.MaterialAlertDialog">
+        <item name="colorPrimary">#639068</item>
+        <item name="android:textColorPrimary">#241203</item>
+        <item name="fontFamily">@font/oswald_medium</item>
+    </style>
+
+
+</resources>
+
+<!--темній цвет #241203-->

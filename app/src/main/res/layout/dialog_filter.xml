@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <TextView
+            android:id="@+id/textView4"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/oswald_bold"
+            android:text="Фільтрація"
+            android:textColor="#241203"
+            android:textSize="20sp" />
+
+        <com.google.android.material.checkbox.MaterialCheckBox
+            android:id="@+id/checkFavorites"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/oswald_medium"
+            android:text="Обрані"
+            android:textColor="#241203"
+            android:textSize="16sp"
+            android:background="@drawable/checkbox_ripple"
+            app:buttonTint="@color/checkbox_tint" />
+
+        <CheckBox
+            android:id="@+id/checkCompleted"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/oswald_semibold"
+            android:text="Завершені"
+            android:textColor="#241203"
+            android:textSize="16sp"
+            android:background="@drawable/checkbox_ripple"
+            app:buttonTint="@color/checkbox_tint"/>
+
+        <CheckBox
+            android:id="@+id/checkQuotes"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/oswald_semibold"
+            android:text="З цитатами"
+            android:textColor="#241203"
+            android:textSize="16sp"
+            android:background="@drawable/checkbox_ripple"
+            app:buttonTint="@color/checkbox_tint"/>
+
+        <CheckBox
+            android:id="@+id/checkNotes"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/oswald_semibold"
+            android:text="З нотатками"
+            android:textColor="#241203"
+            android:textSize="16sp"
+            android:background="@drawable/checkbox_ripple"
+            app:buttonTint="@color/checkbox_tint"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:fontFamily="@font/oswald_semibold"
+            android:text="Рейтинг"
+            android:textColor="#241203"
+            android:textSize="18sp" />
+
+        <SeekBar
+            android:id="@+id/seekRating"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:max="10"
+            android:progressTint="#241203" />
+
+        <TextView
+            android:id="@+id/textRatingValue"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/oswald_semibold"
+            android:text="0/10"
+            android:textColor="#241203"
+            android:textSize="16sp" />
+
+    </LinearLayout>
+
+</ScrollView>

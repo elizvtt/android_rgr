@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/dialog_background">
+    
+    <ImageView
+        android:layout_width="70dp"
+        android:layout_height="wrap_content"
+        android:src="@drawable/icon_remove"
+        android:scaleType="centerCrop"
+        android:layout_gravity="center|top"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="5dp"
+        android:fontFamily="@font/oswald"
+        android:paddingStart="8dp"
+
+        android:text="Додатково"
+        android:textAlignment="viewStart"
+        android:textColor="#C9241203"
+        android:textSize="40sp" />
+    
+    <LinearLayout
+        android:id="@+id/photoAddLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="10dp"
+        android:layout_marginTop="10dp">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/icon_acc_photo"/>
+        
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Додати фото профілю"
+            android:textColor="#241203"
+            android:fontFamily="@font/oswald_medium"
+            android:textSize="18sp"
+            android:layout_marginStart="30dp"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/profileEditLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="10dp"
+        android:layout_marginTop="10dp">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/icon_update"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Редагувати профіль"
+            android:textColor="#241203"
+            android:fontFamily="@font/oswald_medium"
+            android:textSize="18sp"
+            android:layout_marginStart="30dp"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/signOutLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingTop="10dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:paddingBottom="30dp"
+        android:layout_marginTop="10dp">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/icon_sign_out"/>
+
+        <TextView
+            android:id="@+id/signOut"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Вийти з облікового запису"
+            android:textColor="#E70000"
+            android:fontFamily="@font/oswald_medium"
+            android:textSize="18sp"
+            android:layout_marginStart="30dp"/>
+    </LinearLayout>
+
+</LinearLayout>
