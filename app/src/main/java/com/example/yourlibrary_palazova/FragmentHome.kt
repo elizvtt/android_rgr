@@ -29,6 +29,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.firebase.auth.FirebaseAuth
 import kotlin.text.lowercase
 import androidx.core.graphics.toColorInt
+import com.example.yourlibrary_palazova.helpers.SwipeHelper
 
 class FragmentHome : Fragment() {
 
