@@ -18,6 +18,7 @@ import android.widget.TextView
 import android.widget.Toast
 import android.util.Log
 import android.util.TypedValue
+import android.view.WindowManager
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -88,8 +89,7 @@ class FragmentHome : Fragment() {
                     override fun onStopTrackingTouch(seekBar: SeekBar?) {}
                 })
 
-                val dialog =
-                    AlertDialog.Builder(requireContext(), R.style.ThemeOverlay_App_FilterDialog)
+                val dialog = AlertDialog.Builder(requireContext(), R.style.ThemeOverlay_App_FilterDialog)
                         .setView(dialogView)
                         .setPositiveButton("Застосувати") { _, _ ->
                             currentOnlyFavorites = checkFavorites.isChecked
@@ -292,7 +292,7 @@ class FragmentHome : Fragment() {
 
 
     private fun showAuthRequiredDialog() {
-        val dialog = AlertDialog.Builder(requireContext(), R.style.ThemeOverlay_App_FilterDialog)
+        val dialog = AlertDialog.Builder(requireContext(), R.style.CustomDialogStyle)
             .setTitle("Не авторизовані")
             .setMessage("Ви не авторизовані.\nЩоб додати книгу, спершу потрібно увійти.")
             .setPositiveButton("Продовжити") { dialog, _ ->
@@ -301,7 +301,19 @@ class FragmentHome : Fragment() {
                 startActivity(intent)
                 dialog.dismiss()
             }
+            .create()
         dialog.show()
+        dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE).apply {
+            setTextColor("#639068".toColorInt())
+            setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
+        }
+
+        val window = dialog.window
+        window?.setLayout(
+            (requireContext().resources.displayMetrics.widthPixels * 0.85).toInt(),  // ширина 90% экрана
+            WindowManager.LayoutParams.WRAP_CONTENT
+        )
+
     }
 
 
