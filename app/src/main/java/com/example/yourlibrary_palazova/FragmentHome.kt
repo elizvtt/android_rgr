@@ -30,7 +30,6 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.firebase.auth.FirebaseAuth
 import kotlin.text.lowercase
 import androidx.core.graphics.toColorInt
-import com.example.yourlibrary_palazova.helpers.SwipeHelper
 
 class FragmentHome : Fragment() {
 
@@ -160,7 +159,7 @@ class FragmentHome : Fragment() {
         },
             object : BookAdapter.OnBookClickListener {
                 override fun onBookClick(book: Book) {
-                    val intent = Intent(requireContext(), BookPageActivity::class.java)
+                    val intent = Intent(requireContext(), ActivityBookPage::class.java)
                     intent.putExtra("BOOK_ID", book.id)
                     startActivity(intent)
                 }
@@ -197,7 +196,7 @@ class FragmentHome : Fragment() {
                 user.reload().addOnCompleteListener { task ->
                     if (task.isSuccessful) {
                         if (auth.currentUser != null) {
-                            val intent = Intent(requireContext(), AddBookActivity::class.java)
+                            val intent = Intent(requireContext(), ActivityAddBook::class.java)
 //                            startActivity(intent)
                             addBookLauncher.launch(intent)
                         }
@@ -296,7 +295,7 @@ class FragmentHome : Fragment() {
             .setTitle("Не авторизовані")
             .setMessage("Ви не авторизовані.\nЩоб додати книгу, спершу потрібно увійти.")
             .setPositiveButton("Продовжити") { dialog, _ ->
-                val intent = Intent(requireContext(), AuthActivity::class.java)
+                val intent = Intent(requireContext(), ActivityAuth::class.java)
                 intent.putExtra("action", "signUp")
                 startActivity(intent)
                 dialog.dismiss()

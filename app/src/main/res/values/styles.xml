@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <!-- Стиль для прозрачного BottomSheet -->
     <style name="TransparentBottomSheetTheme" parent="Theme.Design.Light.BottomSheetDialog">
         <item name="bottomSheetStyle">@style/TransparentBottomSheetStyle</item>
     </style>
@@ -29,8 +28,8 @@
     </style>
 
     <style name="PopupMenuStyle" parent="Widget.AppCompat.PopupMenu">
-        <item name="android:textColor">#241203</item> <!-- цвет текста -->
-        <item name="android:fontFamily">@font/oswald_medium</item>     <!-- размер текста -->
+        <item name="android:textColor">#241203</item>
+        <item name="android:fontFamily">@font/oswald_medium</item>
         <item name="android:background">@drawable/rounded_background</item>
     </style>
 
@@ -43,4 +42,4 @@
 
 </resources>
 
-<!--темній цвет #241203-->
+<!--#241203-->

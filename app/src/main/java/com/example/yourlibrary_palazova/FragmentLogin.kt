@@ -2,6 +2,7 @@ package com.example.yourlibrary_palazova
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -76,7 +77,7 @@ class FragmentLogin : Fragment() {
                 auth.signInWithEmailAndPassword(email, password)
                     .addOnCompleteListener { task ->
                         if (task.isSuccessful) {
-                            val intent = Intent(requireContext(), MainActivity::class.java)
+                            val intent = Intent(requireContext(), ActivityMain::class.java)
                             startActivity(intent)
                             requireActivity().finish()
                             Toast.makeText(requireContext(), "З поверненням!", Toast.LENGTH_SHORT).show()
@@ -101,7 +102,7 @@ class FragmentLogin : Fragment() {
                                 Toast.makeText(requireContext(), "Необхідно повторно увійти", Toast.LENGTH_LONG).show()
                             } else {
                                 // Обрабатываем ошибку других типов
-                                Toast.makeText(requireContext(), "Помилка 2: ${exception?.message}", Toast.LENGTH_LONG).show()
+                                Log.d("Fragment Login", "Помилка: ${exception?.message}")
                             }
                         }
                     }
@@ -115,7 +116,6 @@ class FragmentLogin : Fragment() {
                 }
             }
         }
-
         return view
     }
 }

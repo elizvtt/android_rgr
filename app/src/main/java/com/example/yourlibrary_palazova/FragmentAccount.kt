@@ -80,14 +80,14 @@ class FragmentAccount : Fragment() {
         if (!isUserLoggedIn()) {
             // обработчик для кнопки регистрации
             signInButton.setOnClickListener {
-                val intent = Intent(activity, AuthActivity::class.java)
+                val intent = Intent(activity, ActivityAuth::class.java)
                 intent.putExtra("action", "signUp")
                 startActivity(intent)
             }
 
             // обработчик для кнопки входа
             logInButton.setOnClickListener {
-                val intent = Intent(activity, AuthActivity::class.java)
+                val intent = Intent(activity, ActivityAuth::class.java)
                 intent.putExtra("action", "logIn")
                 startActivity(intent)
             }

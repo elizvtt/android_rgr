@@ -178,7 +178,7 @@ class FragmentRegister : Fragment() {
                     .build()
 
                 user.updateProfile(profileUpdates).addOnCompleteListener {
-                    val intent = Intent(requireActivity(), MainActivity::class.java)
+                    val intent = Intent(requireActivity(), ActivityMain::class.java)
                     intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                     startActivity(intent)
                     requireActivity().finish()

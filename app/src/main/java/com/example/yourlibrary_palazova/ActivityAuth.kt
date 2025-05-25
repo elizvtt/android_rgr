@@ -3,7 +3,7 @@ package com.example.yourlibrary_palazova
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 
-class AuthActivity : AppCompatActivity() {
+class ActivityAuth : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

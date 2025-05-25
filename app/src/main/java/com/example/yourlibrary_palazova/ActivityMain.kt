@@ -6,7 +6,7 @@ import androidx.core.view.get
 import androidx.viewpager2.widget.ViewPager2
 import com.example.yourlibrary_palazova.databinding.ActivityMainBinding
 
-class MainActivity : AppCompatActivity() {
+class ActivityMain : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var pagerAdapter: ViewPagerAdapter

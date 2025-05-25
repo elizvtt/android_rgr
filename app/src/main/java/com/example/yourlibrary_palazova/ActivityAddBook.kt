@@ -1,6 +1,5 @@
 package com.example.yourlibrary_palazova
 
-import android.app.Activity
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.viewModels
@@ -12,7 +11,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-class AddBookActivity : AppCompatActivity() {
+class ActivityAddBook : AppCompatActivity() {
 
     private lateinit var binding: ActivityAddBookBinding
     private val booksViewModel: BooksViewModel by viewModels()
