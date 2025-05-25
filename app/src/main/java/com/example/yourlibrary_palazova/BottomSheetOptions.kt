@@ -33,6 +33,7 @@ import java.io.FileOutputStream
 class BottomSheetOptions : BottomSheetDialogFragment() {
 
     private var imageUri: Uri? = null
+    private var listener: AvatarUpdateListener? = null
 
     // launcher для запроса разрешения камеры
     private val requestPermissionLauncher =
@@ -56,6 +57,13 @@ class BottomSheetOptions : BottomSheetDialogFragment() {
         uri?.let { saveImageFromUriToInternalStorage(it) }
     }
 
+    interface AvatarUpdateListener {
+        fun onAvatarDeleted()
+    }
+
+    fun setAvatarUpdateListener(listener: AvatarUpdateListener) {
+        this.listener = listener
+    }
 
     override fun getTheme(): Int = R.style.TransparentBottomSheetTheme
 
@@ -95,6 +103,7 @@ class BottomSheetOptions : BottomSheetDialogFragment() {
             Toast.makeText(context, "Edit", Toast.LENGTH_SHORT).show()
             dismiss()
         }
+
         view.findViewById<TextView>(R.id.signOut).setOnClickListener {
             val dialog = AlertDialog.Builder(requireContext(), R.style.CustomDialogStyle)
                 .setTitle("Підтвердити вихід")
@@ -228,6 +237,7 @@ class BottomSheetOptions : BottomSheetDialogFragment() {
             userRef.update("photoUrl", null)
                 .addOnSuccessListener {
                     Toast.makeText(context, "Фото профілю видалено", Toast.LENGTH_SHORT).show()
+                    listener?.onAvatarDeleted()
                     dismiss()
                 }
                 .addOnFailureListener {
@@ -237,7 +247,5 @@ class BottomSheetOptions : BottomSheetDialogFragment() {
             Toast.makeText(context, "Не вдалося отримати дані користувача", Toast.LENGTH_SHORT).show()
         }
     }
-
-
 
 }

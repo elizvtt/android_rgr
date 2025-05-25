@@ -22,7 +22,7 @@ import java.util.Calendar
 import java.util.Locale
 
 
-class FragmentAccount : Fragment() {
+class FragmentAccount : Fragment(), BottomSheetOptions.AvatarUpdateListener {
 
     private lateinit var emptyText1: TextView
     private lateinit var emptyText2: TextView
@@ -38,7 +38,6 @@ class FragmentAccount : Fragment() {
     private lateinit var textLinkFav: TextView
 
     private lateinit var editProfileButton: ImageButton
-
 
     private lateinit var  booksViewModel: BooksViewModel
 
@@ -95,6 +94,7 @@ class FragmentAccount : Fragment() {
         } else {
             editProfileButton.setOnClickListener {
                 val bottomSheet = BottomSheetOptions()
+                bottomSheet.setAvatarUpdateListener(this)
                 bottomSheet.show(parentFragmentManager, "BottomSheetOptions")
             }
         }
@@ -183,24 +183,20 @@ class FragmentAccount : Fragment() {
                         accountPhoto2.visibility = View.VISIBLE
                         accountPhoto.visibility = View.GONE
                         accountPhoto2.loadImage(bitmap)
-                    } else {
-                        // Файл локально не найден — поставить плейсхолдер
-                        accountPhoto2.visibility = View.GONE
-                        accountPhoto.visibility = View.VISIBLE
-                        accountPhoto.setImageResource(R.drawable.icon_profile)
-                    }
-                } else {
-                    // фото отсутствует, показываем плейсхолдер
-                    accountPhoto2.visibility = View.GONE
-                    accountPhoto.visibility = View.VISIBLE
-                    accountPhoto.setImageResource(R.drawable.icon_profile)
-                }
+                    } else showDefaultAvatar()
+                } else showDefaultAvatar()
             }
-            .addOnFailureListener {
-                // ошибка загрузки - показываем плейсхолдер
-                accountPhoto2.visibility = View.GONE
-                accountPhoto.visibility = View.VISIBLE
-                accountPhoto.setImageResource(R.drawable.icon_profile)
-            }
+            // ошибка загрузки - показываем плейсхолдер
+            .addOnFailureListener { showDefaultAvatar() }
     }
+
+    override fun onAvatarDeleted() {
+        showDefaultAvatar()
+    }
+    private fun showDefaultAvatar() {
+        accountPhoto2.visibility = View.GONE
+        accountPhoto.visibility = View.VISIBLE
+        accountPhoto.setImageResource(R.drawable.icon_profile)
+    }
+
 }

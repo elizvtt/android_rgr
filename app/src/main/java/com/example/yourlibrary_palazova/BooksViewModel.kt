@@ -41,7 +41,11 @@ class BooksViewModel : ViewModel() {
     }
 
 
-    fun addBook(book: Book, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
+    fun addBook(
+        book: Book,
+        onSuccess: () -> Unit,
+        onFailure: (Exception) -> Unit
+    ) {
         val user = auth.currentUser ?: return
         val booksRef = db.collection("users")
             .document(user.uid)
@@ -62,7 +66,11 @@ class BooksViewModel : ViewModel() {
     }
 
 
-    fun deleteBook(bookId: String, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
+    fun deleteBook(
+        bookId: String,
+        onSuccess: () -> Unit,
+        onFailure: (Exception) -> Unit
+    ) {
         val user = auth.currentUser ?: return
         val bookDocRef = db.collection("users")
             .document(user.uid)
@@ -78,5 +86,23 @@ class BooksViewModel : ViewModel() {
                 onFailure(e)
             }
     }
+
+    fun updateBook (
+        bookId: String,
+        updatedBook: Book,
+        onSuccess: () -> Unit,
+        onFailure: (Exception) -> Unit
+    ) {
+        val user = auth.currentUser ?: return
+        val bookDocRef = db.collection("users")
+            .document(user.uid)
+            .collection("books")
+            .document(bookId)
+
+        bookDocRef.set(updatedBook)
+            .addOnSuccessListener { onSuccess() }
+            .addOnFailureListener { onFailure(it) }
+    }
+
 
 }

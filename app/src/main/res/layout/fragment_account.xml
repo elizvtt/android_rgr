@@ -87,7 +87,6 @@
         android:layout_marginStart="24dp"
         android:contentDescription="Account Photo"
         android:scaleType="centerCrop"
-        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
@@ -101,6 +100,7 @@
         android:layout_width="180dp"
         android:layout_height="180dp"
         android:scaleType="centerCrop"
+        android:visibility="gone"
         app:avatarViewBorderColor="#EDE9DF"
         app:avatarViewBorderRadius="15dp"
         app:avatarViewShape="rounded_rect"
@@ -125,8 +125,7 @@
         android:textSize="34sp"
         app:layout_constraintBottom_toTopOf="@+id/guideline2"
         app:layout_constraintEnd_toStartOf="@+id/editProfileButton"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/accountPhoto2"
+        app:layout_constraintStart_toStartOf="@+id/guideline3"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.244" />
 
@@ -212,6 +211,13 @@
         app:layout_constraintTop_toTopOf="@+id/accountName"
         app:layout_constraintVertical_bias="0.368"
         app:srcCompat="@drawable/icon_update" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_begin="204dp" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,11 +1,16 @@
 package com.example.yourlibrary_palazova
 
+import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
+import android.app.Activity
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -17,6 +22,11 @@ class ActivityBookPage : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth
 
     private lateinit var bookId: String
+    private lateinit var buttonEdit: ImageButton
+    private lateinit var currentBook: Book
+    private lateinit var editBookLauncher: ActivityResultLauncher<Intent>
+
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,12 +36,36 @@ class ActivityBookPage : AppCompatActivity() {
         auth = FirebaseAuth.getInstance()
 
         bookId = intent.getStringExtra("BOOK_ID") ?: ""
+        buttonEdit = findViewById(R.id.imageButtonEdit)
 
         if (bookId.isNotEmpty()) {
             loadBookDetails(bookId)
         } else {
-            Toast.makeText(this, "Book ID не задан", Toast.LENGTH_SHORT).show()
+            Log.d("Activity Book Page", "Book ID не задан")
             finish()
+        }
+
+        editBookLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                // Книга оновлена — онови дані
+                loadBookDetails(bookId)
+            }
+        }
+
+        buttonEdit.setOnClickListener {
+            val intent = Intent(this, ActivityAddBook::class.java).apply {
+                putExtra("action", "edit book")
+                putExtra("bookId", bookId)
+                putExtra("title", currentBook.title)
+                putExtra("author", currentBook.author)
+                putExtra("startDate", currentBook.startDate)
+                putExtra("endDate", currentBook.endDate)
+                putExtra("rating", currentBook.rating)
+                putStringArrayListExtra("notes", ArrayList(currentBook.notes ?: listOf()))
+                putStringArrayListExtra("quotes", ArrayList(currentBook.quotes ?: listOf()))
+            }
+
+            editBookLauncher.launch(intent)
         }
     }
 
@@ -48,16 +82,17 @@ class ActivityBookPage : AppCompatActivity() {
                     val book = document.toObject(Book::class.java)
                     book?.let { bindBookDetails(it) }
                 } else {
-                    Toast.makeText(this, "Книга не найдена", Toast.LENGTH_SHORT).show()
+                    Log.d("Activity Book Page", "Книга не знайдена")
                     finish()
                 }
             }
             .addOnFailureListener {
-                Toast.makeText(this, "Ошибка загрузки книги", Toast.LENGTH_SHORT).show()
+                Log.d("Activity Book Page", "Помилка завантаження книги")
             }
     }
 
     private fun bindBookDetails(book: Book) {
+        currentBook = book
         findViewById<TextView>(R.id.bookTitle).text = book.title
         findViewById<TextView>(R.id.bookAuthor).text = book.author
         findViewById<TextView>(R.id.startDate).text = "Почато: ${book.startDate ?: "-"}"
@@ -124,4 +159,5 @@ class ActivityBookPage : AppCompatActivity() {
             }
         }
     }
+
 }

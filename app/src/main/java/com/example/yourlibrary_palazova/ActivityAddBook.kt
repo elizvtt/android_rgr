@@ -1,6 +1,8 @@
 package com.example.yourlibrary_palazova
 
+import android.app.Activity
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -23,6 +25,39 @@ class ActivityAddBook : AppCompatActivity() {
 
         setupDatePickers() // відкриття Date Pickers
 
+        val action = intent.getStringExtra("action")
+        val bookId = intent.getStringExtra("bookId")
+
+        if (action == "edit book") {
+            Log.d("BookEdit", "Action: $action")
+            Log.d("BookEdit", "BookId: $bookId")
+            Log.d("BookEdit", "Title: ${intent.getStringExtra("title")}")
+            Log.d("BookEdit", "Author: ${intent.getStringExtra("author")}")
+
+            binding.pageTitle.text = "Редагувати"
+            binding.addBook.text = "Зберегти зміни"
+
+            // Заблокировать неизменяемые поля
+            binding.textInputTitle.isEnabled = false
+            binding.textInputAuthor.isEnabled = false
+            binding.textInputStart.isEnabled = false
+
+            // Установить значения в поля
+            binding.textInputTitle.setText(intent.getStringExtra("title"))
+            binding.textInputAuthor.setText(intent.getStringExtra("author"))
+            binding.textInputStart.setText(intent.getStringExtra("startDate"))
+            binding.textInputFinish.setText(intent.getStringExtra("endDate"))
+
+            val rating = intent.getIntExtra("rating", 0)
+            binding.ratingBar.rating = rating / 2f
+
+            val quotes = intent.getStringArrayListExtra("quotes")?.joinToString("\n") ?: ""
+            val notes = intent.getStringArrayListExtra("notes")?.joinToString("\n") ?: ""
+
+            binding.textInputDescription.setText(quotes)
+            binding.textInputNotes.setText(notes)
+        }
+
         binding.addBook.setOnClickListener {
             val title = binding.textInputTitle.text.toString().trim()
             val author = binding.textInputAuthor.text.toString().trim()
@@ -33,11 +68,6 @@ class ActivityAddBook : AppCompatActivity() {
                 .lines().map { it.trim() }.filter { it.isNotBlank() }
             val notesList = binding.textInputNotes.text.toString()
                 .lines().map { it.trim() }.filter { it.isNotBlank() }
-
-            // Очистка предыдущих ошибок
-            binding.textInputLayout5.error = null
-            binding.textInputLayout6.error = null
-            binding.textInputLayout7.error = null
 
             // Очистка предыдущих ошибок
             binding.textInputLayout5.error = null
@@ -72,16 +102,32 @@ class ActivityAddBook : AppCompatActivity() {
                 timestamp = System.currentTimeMillis()
             )
 
-            booksViewModel.addBook(
-                book = newBook,
-                onSuccess = {
-                    Toast.makeText(this, "Книгу додано", Toast.LENGTH_SHORT).show()
-                    finish() // Закрываем активность
-                },
-                onFailure = {
-                    Toast.makeText(this, "Помилка: ${it.message}", Toast.LENGTH_LONG).show()
-                }
-            )
+            if (action == "edit book" && bookId != null) {
+                booksViewModel.updateBook(
+                    bookId = bookId,
+                    updatedBook = newBook,
+                    onSuccess = {
+                        Log.d("UpdateBook", "Книга ${bookId} успешно обновлена")
+                        Toast.makeText(this, "Книгу оновлено", Toast.LENGTH_SHORT).show()
+                        setResult(Activity.RESULT_OK)
+                        finish()
+                    },
+                    onFailure = { e ->
+                        Log.d("Activity Add Book - Edit Book", "Помилка: ${e.message}")
+                    }
+                )
+            } else {
+                booksViewModel.addBook(
+                    book = newBook,
+                    onSuccess = {
+                        Toast.makeText(this, "Книгу додано", Toast.LENGTH_SHORT).show()
+                        finish() // Закрываем активность
+                    },
+                    onFailure = {
+                        Toast.makeText(this, "Помилка: ${it.message}", Toast.LENGTH_LONG).show()
+                    }
+                )
+            }
         }
     }
 
