@@ -3,13 +3,17 @@ package com.example.yourlibrary_palazova
 import android.content.Intent
 import android.graphics.BitmapFactory
 import android.os.Bundle
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageButton
 import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.ScrollView
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.google.firebase.auth.FirebaseAuth
@@ -35,9 +39,11 @@ class FragmentAccount : Fragment(), BottomSheetOptions.AvatarUpdateListener {
     private lateinit var textReadAll: TextView
     private lateinit var textReadLatest: TextView
     private lateinit var textReading: TextView
-    private lateinit var textLinkFav: TextView
 
     private lateinit var editProfileButton: ImageButton
+
+    private lateinit var favoritesBlock: LinearLayout
+
 
     private lateinit var  booksViewModel: BooksViewModel
 
@@ -65,8 +71,7 @@ class FragmentAccount : Fragment(), BottomSheetOptions.AvatarUpdateListener {
         textReadAll = view.findViewById(R.id.textReadAll)
         textReadLatest = view.findViewById(R.id.textReadLatest)
         textReading = view.findViewById(R.id.textReading)
-        textLinkFav = view.findViewById(R.id.textLinkFav)
-
+        favoritesBlock = view.findViewById(R.id.favoritesBlock)
 
         // Проверяем, авторизован ли пользователь
         val isLoggedIn = isUserLoggedIn()
@@ -109,35 +114,17 @@ class FragmentAccount : Fragment(), BottomSheetOptions.AvatarUpdateListener {
 
 
     private fun updateUI(isLoggedIn: Boolean, books: List<Book>? = null) {
+        val notLoggedInViews = listOf(emptyText1, emptyText2, signInButton, logInButton)
+        val loggedInViews = listOf(accountName, editProfileButton, textReadAll, textReadLatest, textReading, favoritesBlock)
+
         if (!isLoggedIn) {
             // Показываем тексты и кнопки для неавторизованного пользователя
-            emptyText1.visibility = View.VISIBLE
-            emptyText2.visibility = View.VISIBLE
-            signInButton.visibility = View.VISIBLE
-            logInButton.visibility = View.VISIBLE
-
-//            accountPhoto.visibility = View.INVISIBLE
-            accountName.visibility = View.INVISIBLE
-            editProfileButton.visibility = View.INVISIBLE
-            textReadAll.visibility = View.INVISIBLE
-            textReadLatest.visibility = View.INVISIBLE
-            textReading.visibility = View.INVISIBLE
-            textLinkFav.visibility = View.INVISIBLE
-
+            notLoggedInViews.forEach { it.visibility = View.VISIBLE }
+            loggedInViews.forEach { it.visibility = View.INVISIBLE }
         } else {
             // Прячем тексты и кнопки для авторизованного пользователя
-            emptyText1.visibility = View.INVISIBLE
-            emptyText2.visibility = View.INVISIBLE
-            signInButton.visibility = View.INVISIBLE
-            logInButton.visibility = View.INVISIBLE
-
-//            accountPhoto.visibility = View.VISIBLE
-            accountName.visibility = View.VISIBLE
-            editProfileButton.visibility = View.VISIBLE
-            textReadAll.visibility = View.VISIBLE
-            textReadLatest.visibility = View.VISIBLE
-            textReading.visibility = View.VISIBLE
-            textLinkFav.visibility = View.VISIBLE
+            notLoggedInViews.forEach { it.visibility = View.INVISIBLE }
+            loggedInViews.forEach { it.visibility = View.VISIBLE }
 
             val user = FirebaseAuth.getInstance().currentUser
             accountName.text = user?.displayName ?: "Username"
@@ -166,6 +153,9 @@ class FragmentAccount : Fragment(), BottomSheetOptions.AvatarUpdateListener {
 
                 textReadLatest.text = "Прочитано за останній час: ${booksWithinTwoMonths.size}"
                 textReading.text = "Читаю: ${booksWithoutEndDate.size}"
+
+                val favoriteBooks = books.filter { it.favorites == true }
+                setupFavoriteBooks(favoriteBooks)
             }
         }
 
@@ -193,10 +183,40 @@ class FragmentAccount : Fragment(), BottomSheetOptions.AvatarUpdateListener {
     override fun onAvatarDeleted() {
         showDefaultAvatar()
     }
+
     private fun showDefaultAvatar() {
         accountPhoto2.visibility = View.GONE
         accountPhoto.visibility = View.VISIBLE
         accountPhoto.setImageResource(R.drawable.icon_profile)
+    }
+
+    private fun setupFavoriteBooks(favoriteBooks: List<Book>?) {
+        val favoritesContainer = view?.findViewById<LinearLayout>(R.id.favoritesContainer)
+        val favoritesScrollView = view?.findViewById<ScrollView>(R.id.favoritesScrollView)
+        val toggleButton = view?.findViewById<ImageButton>(R.id.buttonToggleFavorites)
+
+        favoritesContainer?.removeAllViews()
+
+        if (favoriteBooks.isNullOrEmpty()) {
+            favoritesContainer?.visibility = View.GONE
+            favoritesScrollView?.visibility = View.GONE
+        } else {
+
+            favoriteBooks.forEach { book ->
+                val textView = TextView(requireContext())
+                textView.text = "• «${book.title}» - ${book.author}"
+//                textView.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
+//                textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
+                textView.setPadding(8, 4, 8, 4)
+                favoritesContainer?.addView(textView)
+            }
+        }
+
+        toggleButton?.setOnClickListener {
+            val isVisible = favoritesScrollView?.visibility == View.VISIBLE
+            val newVisibility = if (isVisible) View.GONE else View.VISIBLE
+            favoritesScrollView?.visibility = newVisibility
+        }
     }
 
 }

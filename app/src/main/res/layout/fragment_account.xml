@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -109,9 +108,7 @@
         app:layout_constraintHorizontal_bias="0.103"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.041">
-
-    </io.getstream.avatarview.AvatarView>
+        app:layout_constraintVertical_bias="0.041" />
 
     <TextView
         android:id="@+id/accountName"
@@ -128,6 +125,27 @@
         app:layout_constraintStart_toStartOf="@+id/guideline3"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.244" />
+
+    <ImageButton
+        android:id="@+id/editProfileButton"
+        android:layout_width="43dp"
+        android:layout_height="40dp"
+        android:layout_marginEnd="8dp"
+        android:background="@null"
+        app:layout_constraintBottom_toBottomOf="@+id/accountName"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/accountName"
+        app:layout_constraintTop_toTopOf="@+id/accountName"
+        app:layout_constraintVertical_bias="0.368"
+        app:srcCompat="@drawable/icon_update" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_end="207dp" />
 
     <TextView
         android:id="@+id/textReadAll"
@@ -178,46 +196,69 @@
         app:layout_constraintTop_toBottomOf="@+id/textReadLatest"
         app:layout_constraintVertical_bias="0.0" />
 
-    <TextView
-        android:id="@+id/textLinkFav"
-        android:layout_width="0dp"
+
+    <LinearLayout
+        android:id="@+id/favoritesBlock"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
-        android:layout_marginTop="16dp"
-        android:clickable="true"
-        android:fontFamily="@font/oswald_semibold"
-        android:paddingStart="3dp"
-        android:text="@string/underlined_text"
-        android:textColor="#351B05"
-        android:textSize="28sp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
+        android:background="@drawable/rounded_background"
+        android:backgroundTint="#66F1EDE3"
+        android:orientation="vertical"
+        android:padding="8dp"
+        android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textReading"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintVertical_bias="0.0">
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
-    <ImageButton
-        android:id="@+id/editProfileButton"
-        android:layout_width="43dp"
-        android:layout_height="40dp"
-        android:layout_marginEnd="8dp"
-        android:background="@null"
-        app:layout_constraintBottom_toBottomOf="@+id/accountName"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/accountName"
-        app:layout_constraintTop_toTopOf="@+id/accountName"
-        app:layout_constraintVertical_bias="0.368"
-        app:srcCompat="@drawable/icon_update" />
+            <TextView
+                android:id="@+id/favoritesTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:fontFamily="@font/oswald_medium"
+                android:text="Обрані книги"
+                android:textColor="#351B05"
+                android:textSize="24sp" />
 
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_begin="204dp" />
+            <ImageButton
+                android:id="@+id/buttonToggleFavorites"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:background="@null"
+                android:contentDescription="Toggle favorites"
+                android:src="@drawable/icon_add_book"
+                app:tint="#9C917F" />
+
+        </LinearLayout>
+
+        <ScrollView
+            android:id="@+id/favoritesScrollView"
+            android:layout_width="match_parent"
+            android:layout_height="250dp"
+            android:visibility="gone" >
+
+            <LinearLayout
+                android:id="@+id/favoritesContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingTop="4dp" />
+
+        </ScrollView>
+
+    </LinearLayout>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

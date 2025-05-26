@@ -18,6 +18,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import me.zhanghai.android.materialratingbar.MaterialRatingBar
+import androidx.core.view.isGone
 
 class ActivityBookPage : AppCompatActivity() {
 
@@ -167,11 +168,7 @@ class ActivityBookPage : AppCompatActivity() {
 
         // Кнопка сворачивания/разворачивания
         findViewById<ImageButton>(R.id.buttonToggleQuotes).setOnClickListener {
-            if (quotesContainer.visibility == View.GONE) {
-                quotesContainer.visibility = View.VISIBLE
-            } else {
-                quotesContainer.visibility = View.GONE
-            }
+            if (quotesContainer.isGone) quotesContainer.visibility = View.VISIBLE else quotesContainer.visibility = View.GONE
         }
     }
 
@@ -192,7 +189,7 @@ class ActivityBookPage : AppCompatActivity() {
         }
 
         findViewById<ImageButton>(R.id.buttonToggleNotes).setOnClickListener {
-            if (notesContainer.visibility == View.GONE) {
+            if (notesContainer.isGone) {
                 notesContainer.visibility = View.VISIBLE
             } else {
                 notesContainer.visibility = View.GONE
