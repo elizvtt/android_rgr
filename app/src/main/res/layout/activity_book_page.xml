@@ -39,16 +39,41 @@
             android:orientation="vertical"
             android:paddingBottom="24dp">
 
-            <TextView
-                android:id="@+id/bookTitle"
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/oswald_bold"
-                android:paddingTop="4dp"
-                android:text="Назва"
-                android:textAlignment="center"
-                android:textColor="#241203"
-                android:textSize="34sp" />
+                android:layout_height="wrap_content">
+
+                <ImageButton
+                    android:id="@+id/buttonBack"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@null"
+                    android:padding="8dp"
+                    android:layout_marginStart="8dp"
+                    app:srcCompat="@drawable/icon_arrow_left"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"/>
+
+                <TextView
+                    android:id="@+id/bookTitle"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="40dp"
+                    android:layout_marginEnd="40dp"
+                    android:fontFamily="@font/oswald_bold"
+                    android:gravity="center"
+                    android:text="Назва"
+                    android:textAlignment="center"
+                    android:textColor="#241203"
+                    android:textSize="34sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
 
             <TextView
                 android:id="@+id/bookAuthor"
@@ -227,25 +252,11 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:paddingTop="8dp"
-                    android:visibility="gone"></LinearLayout>
+                    android:visibility="gone"/>
+
             </LinearLayout>
+
         </LinearLayout>
     </ScrollView>
-
-    <!--    <RatingBar-->
-<!--        android:id="@+id/ratingBar2"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="44dp"-->
-<!--        android:progressTint="#DDD6C7"-->
-<!--        android:scaleX="0.8"-->
-<!--        android:scaleY="0.8"-->
-<!--        app:layout_constraintBottom_toBottomOf="@+id/textRating"-->
-<!--        app:layout_constraintEnd_toEndOf="parent"-->
-<!--        app:layout_constraintHorizontal_bias="0.0"-->
-<!--        app:layout_constraintStart_toEndOf="@+id/textRating"-->
-<!--        app:layout_constraintTop_toTopOf="@+id/textRating"-->
-<!--        app:layout_constraintVertical_bias="1.0" />-->
-<!--    -->
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -91,23 +91,24 @@ class ActivityAddBook : AppCompatActivity() {
 
             if (hasError) return@setOnClickListener
 
-            val newBook = Book(
-                title = title,
-                author = author,
-                startDate = startDate,
-                endDate = finishDate.ifEmpty { null },
-                rating = ratingValue,
-                quotes = quotesList,
-                notes = notesList,
-                timestamp = System.currentTimeMillis()
-            )
 
             if (action == "edit book" && bookId != null) {
+                val updatedBook = Book(
+                    id = bookId,
+                    title = title,
+                    author = author,
+                    startDate = startDate,
+                    endDate = finishDate.ifEmpty { null },
+                    rating = ratingValue,
+                    quotes = quotesList,
+                    notes = notesList,
+                    timestamp = System.currentTimeMillis()
+                )
                 booksViewModel.updateBook(
                     bookId = bookId,
-                    updatedBook = newBook,
+                    updatedBook = updatedBook,
                     onSuccess = {
-                        Log.d("UpdateBook", "Книга ${bookId} успешно обновлена")
+                        Log.d("UpdateBook", "Книга ${bookId}  успішно оновлена")
                         Toast.makeText(this, "Книгу оновлено", Toast.LENGTH_SHORT).show()
                         setResult(Activity.RESULT_OK)
                         finish()
@@ -117,6 +118,16 @@ class ActivityAddBook : AppCompatActivity() {
                     }
                 )
             } else {
+                val newBook = Book(
+                    title = title,
+                    author = author,
+                    startDate = startDate,
+                    endDate = finishDate.ifEmpty { null },
+                    rating = ratingValue,
+                    quotes = quotesList,
+                    notes = notesList,
+                    timestamp = System.currentTimeMillis()
+                )
                 booksViewModel.addBook(
                     book = newBook,
                     onSuccess = {

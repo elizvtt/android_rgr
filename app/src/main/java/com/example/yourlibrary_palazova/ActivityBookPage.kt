@@ -7,7 +7,6 @@ import android.view.View
 import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
-import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import android.app.Activity
@@ -23,6 +22,7 @@ class ActivityBookPage : AppCompatActivity() {
 
     private lateinit var bookId: String
     private lateinit var buttonEdit: ImageButton
+    private lateinit var buttonBack: ImageButton
     private lateinit var currentBook: Book
     private lateinit var editBookLauncher: ActivityResultLauncher<Intent>
 
@@ -37,6 +37,7 @@ class ActivityBookPage : AppCompatActivity() {
 
         bookId = intent.getStringExtra("BOOK_ID") ?: ""
         buttonEdit = findViewById(R.id.imageButtonEdit)
+        buttonBack = findViewById(R.id.buttonBack)
 
         if (bookId.isNotEmpty()) {
             loadBookDetails(bookId)
@@ -66,6 +67,10 @@ class ActivityBookPage : AppCompatActivity() {
             }
 
             editBookLauncher.launch(intent)
+        }
+
+        buttonBack.setOnClickListener {
+            finish()
         }
     }
 
