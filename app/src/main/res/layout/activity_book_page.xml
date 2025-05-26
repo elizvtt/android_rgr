@@ -97,13 +97,17 @@
                 android:textColor="#241203"
                 android:textSize="22sp" />
 
-            <ImageView
-                android:id="@+id/imageView"
+
+            <com.makeramen.roundedimageview.RoundedImageView
+                android:id="@+id/bookCover"
                 android:layout_width="180dp"
-                android:layout_height="220dp"
+                android:layout_height="240dp"
+                android:scaleType="centerCrop"
                 android:layout_gravity="center"
-                android:background="@drawable/rounded_background"
-                tools:srcCompat="@drawable/rounded_background" />
+                app:riv_corner_radius="16dp"
+                app:riv_border_color="#F1EDE3"
+                app:riv_border_width="5dp"
+                android:src="@drawable/rounded_background" />
 
             <ImageButton
                 android:id="@+id/imageButtonEdit"

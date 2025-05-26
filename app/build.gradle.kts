@@ -49,6 +49,9 @@ dependencies {
     implementation(libs.androidx.constraintlayout)
     implementation(libs.library)
     implementation(libs.firebase.storage.ktx)
+    implementation(libs.roundedimageview)
+    implementation(libs.retrofit)
+    implementation(libs.converter.gson)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -58,7 +61,6 @@ dependencies {
     implementation("com.google.firebase:firebase-auth")
     implementation ("com.google.firebase:firebase-firestore")
 
-
-
     implementation("io.getstream:avatarview-coil:1.0.7")
+
 }

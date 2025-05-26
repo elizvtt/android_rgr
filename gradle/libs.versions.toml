@@ -12,6 +12,10 @@ constraintlayout = "2.2.1"
 expandablelayout = "2.9.2"
 library = "1.4.0"
 firebaseStorageKtx = "21.0.2"
+glide = "5.0.0-rc01"
+roundedimageview = "2.3.0"
+retrofit = "3.0.0"
+converterGson = "3.0.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -25,6 +29,10 @@ androidx-constraintlayout = { group = "androidx.constraintlayout", name = "const
 expandablelayout = { group = "net.cachapa.expandablelayout", name = "expandablelayout", version.ref = "expandablelayout" }
 library = { group = "me.zhanghai.android.materialratingbar", name = "library", version.ref = "library" }
 firebase-storage-ktx = { group = "com.google.firebase", name = "firebase-storage-ktx", version.ref = "firebaseStorageKtx" }
+glide = { group = "com.github.bumptech.glide", name = "glide", version.ref = "glide" }
+roundedimageview = { group = "com.makeramen", name = "roundedimageview", version.ref = "roundedimageview" }
+retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
+converter-gson = { group = "com.squareup.retrofit2", name = "converter-gson", version.ref = "converterGson" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

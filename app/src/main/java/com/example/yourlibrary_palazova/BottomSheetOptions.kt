@@ -8,6 +8,7 @@ import android.graphics.Bitmap
 import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
@@ -78,7 +79,11 @@ class BottomSheetOptions : BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        view.findViewById<LinearLayout>(R.id.photoAddLayout).setOnClickListener {
+        val photoAdd = view.findViewById<LinearLayout>(R.id.photoAddLayout)
+        val editProfile = view.findViewById<LinearLayout>(R.id.profileEditLayout)
+        val signOut = view.findViewById<TextView>(R.id.signOut)
+
+        photoAdd.setOnClickListener {
             val options = arrayOf("Зробити фото", "Обрати фото", "Видалити фото")
             val dialog = AlertDialog.Builder(requireContext(), R.style.CustomDialogStyle)
                 .setTitle("Додати фото профілю")
@@ -94,17 +99,17 @@ class BottomSheetOptions : BottomSheetDialogFragment() {
 
             val window = dialog.window
             window?.setLayout(
-                (requireContext().resources.displayMetrics.widthPixels * 0.8).toInt(),  // ширина 90% экрана
+                (requireContext().resources.displayMetrics.widthPixels * 0.8).toInt(),
                 WindowManager.LayoutParams.WRAP_CONTENT
             )
         }
 
-        view.findViewById<LinearLayout>(R.id.profileEditLayout).setOnClickListener {
+        editProfile.setOnClickListener {
             Toast.makeText(context, "Edit", Toast.LENGTH_SHORT).show()
             dismiss()
         }
 
-        view.findViewById<TextView>(R.id.signOut).setOnClickListener {
+        signOut.setOnClickListener {
             val dialog = AlertDialog.Builder(requireContext(), R.style.CustomDialogStyle)
                 .setTitle("Підтвердити вихід")
                 .setMessage("Ви впевнені, що хочете вийти з облікового запису?")
@@ -162,6 +167,7 @@ class BottomSheetOptions : BottomSheetDialogFragment() {
         val bitmap = ImageUtils.getCorrectlyOrientedBitmap(uri, context)
 
         if (bitmap == null) {
+            Log.d("Bottom Sheet Options", "Не вдалося обробити зображення")
             Toast.makeText(context, "Не вдалося обробити зображення", Toast.LENGTH_SHORT).show()
             return
         }
@@ -202,14 +208,9 @@ class BottomSheetOptions : BottomSheetDialogFragment() {
                 openCamera()
             }
             shouldShowRequestPermissionRationale(Manifest.permission.CAMERA) -> {
-                // Можно показать объяснение почему нужно разрешение
-                Toast.makeText(context, "Для зйомки фото потрібен дозвіл на камеру", Toast.LENGTH_LONG).show()
                 requestPermissionLauncher.launch(Manifest.permission.CAMERA)
             }
-            else -> {
-                // Запрашиваем разрешение напрямую
-                requestPermissionLauncher.launch(Manifest.permission.CAMERA)
-            }
+            else -> requestPermissionLauncher.launch(Manifest.permission.CAMERA) // Запрашиваем разрешение напрямую
         }
     }
 
@@ -227,9 +228,7 @@ class BottomSheetOptions : BottomSheetDialogFragment() {
                 val file = File(photoPath)
                 if (file.exists()) {
                     val deleted = file.delete()
-                    if (!deleted) {
-                        Toast.makeText(context, "Не вдалося видалити локальний файл", Toast.LENGTH_SHORT).show()
-                    }
+                    if (!deleted) Log.d("Bottom Sheet Options", "Не вдалося видалити локальний файл")
                 }
             }
 
@@ -241,10 +240,10 @@ class BottomSheetOptions : BottomSheetDialogFragment() {
                     dismiss()
                 }
                 .addOnFailureListener {
-                    Toast.makeText(context, "Помилка при видаленні фото з Firestore", Toast.LENGTH_SHORT).show()
+                    Log.d("Bottom Sheet Options", "Помилка при видаленні фото з Firestore")
                 }
         }.addOnFailureListener {
-            Toast.makeText(context, "Не вдалося отримати дані користувача", Toast.LENGTH_SHORT).show()
+            Log.d("Bottom Sheet Options", "Не вдалося отримати дані користувача")
         }
     }
 

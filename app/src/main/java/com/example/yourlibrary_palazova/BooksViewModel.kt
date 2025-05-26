@@ -1,5 +1,6 @@
 package com.example.yourlibrary_palazova
 
+import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -147,5 +148,28 @@ class BooksViewModel : ViewModel() {
             .addOnSuccessListener { onSuccess() }
             .addOnFailureListener { onFailure(it) }
     }
+
+    fun updateCover(
+        bookId: String,
+        coverUri: Uri?,
+        onSuccess: () -> Unit,
+        onFailure: (Throwable) -> Unit
+    ) {
+        val user = auth.currentUser ?: return
+        val bookDocRef = db.collection("users")
+            .document(user.uid)
+            .collection("books")
+            .document(bookId)
+
+        val updateData = mapOf(
+            "coverUri" to coverUri?.toString()
+        )
+
+        bookDocRef.update(updateData)
+            .addOnSuccessListener { onSuccess() }
+            .addOnFailureListener { exception -> onFailure(exception) }
+
+    }
+
 
 }

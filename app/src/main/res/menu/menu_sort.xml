@@ -15,6 +15,6 @@
     <item
         android:id="@+id/sortByDate"
         android:title="За датою додавання"
-        android:icon="@drawable/icon_arrow_up"/>
+        android:icon="@drawable/icon_arrow_up" />
 
 </menu>

@@ -79,36 +79,23 @@
         app:layout_constraintTop_toBottomOf="@+id/emptyText2"
         app:layout_constraintVertical_bias="0.232" />
 
-    <ImageView
+    <com.makeramen.roundedimageview.RoundedImageView
         android:id="@+id/accountPhoto"
         android:layout_width="180dp"
         android:layout_height="180dp"
         android:layout_marginStart="24dp"
-        android:contentDescription="Account Photo"
+        android:layout_marginTop="32dp"
         android:scaleType="centerCrop"
+        android:src="@drawable/icon_profile"
+        app:riv_border_color="#EDE9DF"
+        app:riv_border_width="5dp"
+        app:riv_corner_radius="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.041"
-        app:srcCompat="@drawable/icon_profile" />
-
-    <io.getstream.avatarview.AvatarView
-        android:id="@+id/accountPhoto2"
-        android:layout_width="180dp"
-        android:layout_height="180dp"
-        android:scaleType="centerCrop"
-        android:visibility="gone"
-        app:avatarViewBorderColor="#EDE9DF"
-        app:avatarViewBorderRadius="15dp"
-        app:avatarViewShape="rounded_rect"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.103"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.041" />
+        app:layout_constraintVertical_bias="0.0" />
 
     <TextView
         android:id="@+id/accountName"

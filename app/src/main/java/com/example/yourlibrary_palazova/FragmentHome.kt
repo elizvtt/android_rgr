@@ -198,10 +198,9 @@ class FragmentHome : Fragment() {
                     if (task.isSuccessful) {
                         if (auth.currentUser != null) {
                             val intent = Intent(requireContext(), ActivityAddBook::class.java)
-//                            startActivity(intent)
                             addBookLauncher.launch(intent)
                         }
-                    } else Log.d("FRAGMENT-HOME", "Помилка: ${task.exception?.message}")
+                    } else Log.d("Fragment Home", "Помилка: ${task.exception?.message}")
                 }
             } else showAuthRequiredDialog()
         }
@@ -247,7 +246,7 @@ class FragmentHome : Fragment() {
                                                         Toast.makeText(requireContext(), "Книгу видалено", Toast.LENGTH_SHORT).show()
                                                     },
                                                     onFailure = { e ->
-                                                        Log.d("FRAGMENT-HOME", "Помилка видалення: ${e.message}")
+                                                        Log.d("Fragment Home", "Помилка видалення: ${e.message}")
                                                     }
                                                 )
                                             }
@@ -265,7 +264,7 @@ class FragmentHome : Fragment() {
                                             setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
                                         }
 
-                                    } else Log.d("FRAGMENT-HOME", "Помилка: невірна позиція ${position}")
+                                    } else Log.d("Fragment Home", "Помилка: невірна позиція ${position}")
                                 }
                             }
                         )
@@ -405,6 +404,14 @@ class FragmentHome : Fragment() {
                     val classPopupHelper = Class.forName(menuPopupHelper.javaClass.name)
                     val setForceIcons = classPopupHelper.getMethod("setForceShowIcon", Boolean::class.javaPrimitiveType)
                     setForceIcons.invoke(menuPopupHelper, true)
+
+                    val popupBackgroundField = classPopupHelper.getDeclaredField("mPopup")
+                    popupBackgroundField.isAccessible = true
+
+                    val popupWindow = popupBackgroundField.get(menuPopupHelper) as? android.widget.PopupWindow
+                    popupWindow?.setBackgroundDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.rounded_background))
+
+
                     break
                 }
             }

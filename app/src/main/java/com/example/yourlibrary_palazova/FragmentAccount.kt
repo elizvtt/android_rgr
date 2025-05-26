@@ -3,23 +3,20 @@ package com.example.yourlibrary_palazova
 import android.content.Intent
 import android.graphics.BitmapFactory
 import android.os.Bundle
-import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageButton
-import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ScrollView
 import android.widget.TextView
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.core.graphics.toColorInt
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import io.getstream.avatarview.AvatarView
-import io.getstream.avatarview.coil.loadImage
+import com.makeramen.roundedimageview.RoundedImageView
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -33,8 +30,7 @@ class FragmentAccount : Fragment(), BottomSheetOptions.AvatarUpdateListener {
     private lateinit var signInButton: Button
     private lateinit var logInButton: Button
 
-    private lateinit var accountPhoto: ImageView
-    private lateinit var accountPhoto2: AvatarView
+    private lateinit var accountPhoto: RoundedImageView
     private lateinit var accountName: TextView
     private lateinit var textReadAll: TextView
     private lateinit var textReadLatest: TextView
@@ -43,7 +39,6 @@ class FragmentAccount : Fragment(), BottomSheetOptions.AvatarUpdateListener {
     private lateinit var editProfileButton: ImageButton
 
     private lateinit var favoritesBlock: LinearLayout
-
 
     private lateinit var  booksViewModel: BooksViewModel
 
@@ -65,7 +60,6 @@ class FragmentAccount : Fragment(), BottomSheetOptions.AvatarUpdateListener {
         logInButton = view.findViewById(R.id.logInButton)
 
         accountPhoto = view.findViewById(R.id.accountPhoto)
-        accountPhoto2 = view.findViewById(R.id.accountPhoto2)
         accountName = view.findViewById(R.id.accountName)
         editProfileButton = view.findViewById(R.id.editProfileButton)
         textReadAll = view.findViewById(R.id.textReadAll)
@@ -170,9 +164,8 @@ class FragmentAccount : Fragment(), BottomSheetOptions.AvatarUpdateListener {
                     val file = File(path)
                     if (file.exists()) {
                         val bitmap = BitmapFactory.decodeFile(file.absolutePath)
-                        accountPhoto2.visibility = View.VISIBLE
-                        accountPhoto.visibility = View.GONE
-                        accountPhoto2.loadImage(bitmap)
+                        accountPhoto.setImageBitmap(bitmap)
+                        accountPhoto.borderColor = "#EDE9DF".toColorInt()
                     } else showDefaultAvatar()
                 } else showDefaultAvatar()
             }
@@ -185,9 +178,8 @@ class FragmentAccount : Fragment(), BottomSheetOptions.AvatarUpdateListener {
     }
 
     private fun showDefaultAvatar() {
-        accountPhoto2.visibility = View.GONE
-        accountPhoto.visibility = View.VISIBLE
         accountPhoto.setImageResource(R.drawable.icon_profile)
+        accountPhoto.borderColor = "#241203".toColorInt()
     }
 
     private fun setupFavoriteBooks(favoriteBooks: List<Book>?) {
@@ -205,8 +197,6 @@ class FragmentAccount : Fragment(), BottomSheetOptions.AvatarUpdateListener {
             favoriteBooks.forEach { book ->
                 val textView = TextView(requireContext())
                 textView.text = "• «${book.title}» - ${book.author}"
-//                textView.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
-//                textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
                 textView.setPadding(8, 4, 8, 4)
                 favoritesContainer?.addView(textView)
             }

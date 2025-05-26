@@ -10,5 +10,6 @@ data class Book(
     val favorites: Boolean = false,
     val quotes: List<String> = emptyList(),
     val notes: List<String> = emptyList(),
-    val timestamp: Long = System.currentTimeMillis()
+    val timestamp: Long = System.currentTimeMillis(),
+    val coverUri: String? = null
 )
