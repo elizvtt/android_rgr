@@ -1,6 +1,7 @@
 package com.example.yourlibrary_palazova
 
 import android.app.Activity
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
@@ -12,11 +13,15 @@ import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import androidx.core.net.toUri
 
 class ActivityAddBook : AppCompatActivity() {
 
     private lateinit var binding: ActivityAddBookBinding
     private val booksViewModel: BooksViewModel by viewModels()
+
+    private var favoritesStatus: Boolean = false
+    private var coverUri: Uri? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,6 +61,9 @@ class ActivityAddBook : AppCompatActivity() {
 
             binding.textInputDescription.setText(quotes)
             binding.textInputNotes.setText(notes)
+
+            favoritesStatus = intent.getBooleanExtra("favorites", false)
+            coverUri = intent.getStringExtra("coverUri")?.toUri()
         }
 
         binding.addBook.setOnClickListener {
@@ -100,9 +108,11 @@ class ActivityAddBook : AppCompatActivity() {
                     startDate = startDate,
                     endDate = finishDate.ifEmpty { null },
                     rating = ratingValue,
+                    favorites = favoritesStatus,
                     quotes = quotesList,
                     notes = notesList,
-                    timestamp = System.currentTimeMillis()
+                    timestamp = System.currentTimeMillis(),
+                    coverUri = coverUri.toString()
                 )
                 booksViewModel.updateBook(
                     bookId = bookId,
@@ -124,9 +134,11 @@ class ActivityAddBook : AppCompatActivity() {
                     startDate = startDate,
                     endDate = finishDate.ifEmpty { null },
                     rating = ratingValue,
+                    favorites = false,
                     quotes = quotesList,
                     notes = notesList,
-                    timestamp = System.currentTimeMillis()
+                    timestamp = System.currentTimeMillis(),
+                    coverUri = null
                 )
                 booksViewModel.addBook(
                     book = newBook,

@@ -109,7 +109,7 @@ class FragmentAccount : Fragment(), BottomSheetOptions.AvatarUpdateListener {
 
     private fun updateUI(isLoggedIn: Boolean, books: List<Book>? = null) {
         val notLoggedInViews = listOf(emptyText1, emptyText2, signInButton, logInButton)
-        val loggedInViews = listOf(accountName, editProfileButton, textReadAll, textReadLatest, textReading, favoritesBlock)
+        val loggedInViews = listOf(accountName, editProfileButton, textReadAll, textReadLatest, textReading, favoritesBlock, accountPhoto)
 
         if (!isLoggedIn) {
             // Показываем тексты и кнопки для неавторизованного пользователя

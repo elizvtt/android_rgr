@@ -155,8 +155,10 @@ class ActivityBookPage : AppCompatActivity() {
                             putExtra("startDate", currentBook.startDate)
                             putExtra("endDate", currentBook.endDate)
                             putExtra("rating", currentBook.rating)
+                            putExtra("favorites", currentBook.favorites)
                             putStringArrayListExtra("notes", ArrayList(currentBook.notes ?: listOf()))
                             putStringArrayListExtra("quotes", ArrayList(currentBook.quotes ?: listOf()))
+                            putExtra("coverUri", currentBook.coverUri)
                         }
 
                         editBookLauncher.launch(intent)
