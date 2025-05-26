@@ -1,5 +1,7 @@
 package com.example.yourlibrary_palazova
 
+import android.animation.ObjectAnimator
+import android.animation.PropertyValuesHolder
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -10,46 +12,55 @@ import android.widget.TextView
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import android.app.Activity
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import me.zhanghai.android.materialratingbar.MaterialRatingBar
 
 class ActivityBookPage : AppCompatActivity() {
 
-    private lateinit var db: FirebaseFirestore
-    private lateinit var auth: FirebaseAuth
-
     private lateinit var bookId: String
-    private lateinit var buttonEdit: ImageButton
-    private lateinit var buttonBack: ImageButton
     private lateinit var currentBook: Book
     private lateinit var editBookLauncher: ActivityResultLauncher<Intent>
 
-
+    private var toast: Toast? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_book_page)
 
-        db = FirebaseFirestore.getInstance()
-        auth = FirebaseAuth.getInstance()
-
         bookId = intent.getStringExtra("BOOK_ID") ?: ""
-        buttonEdit = findViewById(R.id.imageButtonEdit)
-        buttonBack = findViewById(R.id.buttonBack)
 
-        if (bookId.isNotEmpty()) {
-            loadBookDetails(bookId)
-        } else {
+        val viewModel = ViewModelProvider(this)[BooksViewModel::class.java]
+        val buttonEdit = findViewById<ImageButton>(R.id.imageButtonEdit)
+        val buttonBack = findViewById<ImageButton>(R.id.buttonBack)
+        val buttonFav = findViewById<ImageButton>(R.id.buttonFavorite)
+
+        if (bookId.isEmpty()) {
             Log.d("Activity Book Page", "Book ID не задан")
             finish()
+            return
         }
+
+        viewModel.selectedBook.observe(this) { book ->
+            if (book != null) {
+                currentBook = book
+                bindBookDetails(book)
+            } else {
+                Log.d("Activity Book Page", "Книга не знайдена")
+                finish()
+            }
+        }
+
+        viewModel.loadBookDetails(bookId)
+
 
         editBookLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
                 // Книга оновлена — онови дані
-                loadBookDetails(bookId)
+                viewModel.loadBookDetails(bookId)
             }
         }
 
@@ -72,28 +83,40 @@ class ActivityBookPage : AppCompatActivity() {
         buttonBack.setOnClickListener {
             finish()
         }
-    }
 
-    private fun loadBookDetails(bookId: String) {
-        val user = auth.currentUser ?: return
+        buttonFav.setOnClickListener {
+            val scaleUp = ObjectAnimator.ofPropertyValuesHolder(
+                buttonFav,
+                PropertyValuesHolder.ofFloat("scaleX", 1f, 1.3f),
+                PropertyValuesHolder.ofFloat("scaleY", 1f, 1.3f)
+            ).apply {
+                duration = 150
+                repeatMode = ObjectAnimator.REVERSE
+                repeatCount = 1
+            }
 
-        db.collection("users")
-            .document(user.uid)
-            .collection("books")
-            .document(bookId)
-            .get()
-            .addOnSuccessListener { document ->
-                if (document != null && document.exists()) {
-                    val book = document.toObject(Book::class.java)
-                    book?.let { bindBookDetails(it) }
-                } else {
-                    Log.d("Activity Book Page", "Книга не знайдена")
-                    finish()
+            scaleUp.start()
+
+            val currentIsFavorite = buttonFav.tag as? Boolean == true
+            val newFavoriteStatus = !currentIsFavorite
+
+            viewModel.updateFavoriteStatus(
+                bookId = bookId,
+                isFavorite = newFavoriteStatus,
+                onSuccess = {
+                    buttonFav.tag = newFavoriteStatus
+                    updateFavoriteIcon(buttonFav, newFavoriteStatus)
+                    toast?.cancel()
+                    toast = Toast.makeText(this,
+                        if (newFavoriteStatus) "Додано до «Обраного»"
+                        else "Видалено з «Обраного»", Toast.LENGTH_SHORT)
+                    toast?.show()
+                },
+                onFailure = {
+                    Log.d("Activity Book Page", "Не вдалося оновити поле favorite: ${it.message}")
                 }
-            }
-            .addOnFailureListener {
-                Log.d("Activity Book Page", "Помилка завантаження книги")
-            }
+            )
+        }
     }
 
     private fun bindBookDetails(book: Book) {
@@ -105,6 +128,18 @@ class ActivityBookPage : AppCompatActivity() {
         setupRatingBar(book.rating)
         setupQuotes(book.quotes)
         setupNotes(book.notes)
+
+        val buttonFav = findViewById<ImageButton>(R.id.buttonFavorite)
+        val isFavorite = book.favorites
+        buttonFav.tag = isFavorite
+        updateFavoriteIcon(buttonFav, isFavorite)
+    }
+
+    private fun updateFavoriteIcon(button: ImageButton, isFavorite: Boolean) {
+        button.setImageResource(
+            if (isFavorite) R.drawable.icon_heart_filled
+            else R.drawable.icon_heart_unfilled
+        )
     }
 
     private fun setupRatingBar(rating: Int) {

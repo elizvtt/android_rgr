@@ -49,11 +49,10 @@
                     android:layout_height="wrap_content"
                     android:background="@null"
                     android:padding="8dp"
-                    android:layout_marginStart="8dp"
-                    app:srcCompat="@drawable/icon_arrow_left"
+                    app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent"/>
+                    app:srcCompat="@drawable/icon_arrow_left" />
 
                 <TextView
                     android:id="@+id/bookTitle"
@@ -71,6 +70,18 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
+
+                <ImageButton
+                    android:id="@+id/buttonFavorite"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="4dp"
+                    android:background="@null"
+                    android:padding="8dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:srcCompat="@drawable/icon_heart_unfilled" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 

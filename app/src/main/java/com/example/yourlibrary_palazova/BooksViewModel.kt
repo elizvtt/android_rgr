@@ -15,6 +15,10 @@ class BooksViewModel : ViewModel() {
     private val _books = MutableLiveData<List<Book>>()
     val books: LiveData<List<Book>> get() = _books
 
+    private val _selectedBook = MutableLiveData<Book?>()
+    val selectedBook: LiveData<Book?> get() = _selectedBook
+
+
     init {
         loadBooks()
     }
@@ -104,5 +108,44 @@ class BooksViewModel : ViewModel() {
             .addOnFailureListener { onFailure(it) }
     }
 
+    fun loadBookDetails(bookId: String) {
+        val user = auth.currentUser ?: return
+
+        db.collection("users")
+            .document(user.uid)
+            .collection("books")
+            .document(bookId)
+            .get()
+            .addOnSuccessListener { document ->
+                if (document != null && document.exists()) {
+                    val book = document.toObject(Book::class.java)
+                    _selectedBook.value = book
+                } else {
+                    _selectedBook.value = null
+                    Log.d("BooksViewModel", "Книга не знайдена")
+                }
+            }
+            .addOnFailureListener {
+                _selectedBook.value = null
+                Log.d("BooksViewModel", "Помилка завантаження книги: ${it.message}")
+            }
+    }
+
+    fun updateFavoriteStatus(
+        bookId: String,
+        isFavorite: Boolean,
+        onSuccess: () -> Unit = {},
+        onFailure: (Exception) -> Unit = {}
+    ) {
+        val user = auth.currentUser ?: return
+
+        db.collection("users")
+            .document(user.uid)
+            .collection("books")
+            .document(bookId)
+            .update("favorites", isFavorite)
+            .addOnSuccessListener { onSuccess() }
+            .addOnFailureListener { onFailure(it) }
+    }
 
 }
