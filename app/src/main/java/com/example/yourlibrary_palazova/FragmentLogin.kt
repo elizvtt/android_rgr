@@ -25,7 +25,6 @@ class FragmentLogin : Fragment() {
 
     private val auth = FirebaseAuth.getInstance()
 
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -38,6 +37,7 @@ class FragmentLogin : Fragment() {
         emailInputLayout = view.findViewById(R.id.textInputLayout5)
         passwordInputLayout = view.findViewById(R.id.textInputLayout6)
 
+        // текстове посилання для переходу до реєстрації
         val sigUpTextView: TextView = view.findViewById(R.id.textViewLink)
         sigUpTextView.setOnClickListener {
             parentFragmentManager.beginTransaction()
@@ -46,18 +46,18 @@ class FragmentLogin : Fragment() {
                 .commit()
         }
 
+        // текстове посилання для відновлення пароля
         val forgotPassword: TextView = view.findViewById(R.id.forgotPass)
         forgotPassword.setOnClickListener {
             val email = emailEditText.text.toString()
 
             if (email.isNotEmpty()) {
+                // відправляємо лист для скидання пароля через FirebaseAuth
                 auth.sendPasswordResetEmail(email)
                     .addOnCompleteListener { task ->
                         if (task.isSuccessful) {
                             Toast.makeText(requireContext(), "Лист для скидання пароля надіслано", Toast.LENGTH_LONG).show()
-                        } else {
-                            Toast.makeText(requireContext(), "Помилка: ${task.exception?.message}", Toast.LENGTH_LONG).show()
-                        }
+                        } else Log.d("Fragment Login", "Помилка: ${task.exception?.message}")
                     }
             } else {
                 Toast.makeText(requireContext(), "Будь ласка, введіть ваш email", Toast.LENGTH_SHORT).show()
@@ -73,17 +73,19 @@ class FragmentLogin : Fragment() {
             emailInputLayout.error = null
             passwordInputLayout.error = null
 
+            // перевірка, що поля не пусті
             if (email.isNotEmpty() && password.isNotEmpty()) {
                 auth.signInWithEmailAndPassword(email, password)
                     .addOnCompleteListener { task ->
                         if (task.isSuccessful) {
+                            // якщо успішно - переходимо в головну активність
                             val intent = Intent(requireContext(), ActivityMain::class.java)
                             startActivity(intent)
                             requireActivity().finish()
                             Toast.makeText(requireContext(), "З поверненням!", Toast.LENGTH_SHORT).show()
 
                         } else {
-                            // Выводим сообщение об ошибке
+                            // виведення повідомлення про помилки
                             val exception = task.exception
                             if (exception is FirebaseAuthInvalidCredentialsException) {
                                 val errorMessage = exception.message
@@ -98,16 +100,12 @@ class FragmentLogin : Fragment() {
 
                                 }
                             } else if (exception is FirebaseAuthRecentLoginRequiredException) {
-                                // Обработка случая, если пользователь должен заново войти для выполнения действия
                                 Toast.makeText(requireContext(), "Необхідно повторно увійти", Toast.LENGTH_LONG).show()
-                            } else {
-                                // Обрабатываем ошибку других типов
-                                Log.d("Fragment Login", "Помилка: ${exception?.message}")
-                            }
+                            } else Log.d("Fragment Login", "Помилка: ${exception?.message}")
                         }
                     }
             } else {
-                // Если одно из полей пустое
+                // повідомлення про помилки, якщо якісь поля порожні
                 if (email.isEmpty()) {
                     emailInputLayout.error = "Будь ласка, введіть email"
                 }

@@ -17,8 +17,8 @@ class ActivityMain : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        pagerAdapter = ViewPagerAdapter(this)
-        binding.viewPager.adapter = pagerAdapter
+        pagerAdapter = ViewPagerAdapter(this) // створюємо адаптер для ViewPager
+        binding.viewPager.adapter = pagerAdapter // прив'язуємо адаптер до ViewPager
 
         // оновлення елементів у нижній навігації
         binding.viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {

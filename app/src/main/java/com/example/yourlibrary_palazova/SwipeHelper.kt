@@ -15,9 +15,9 @@ import androidx.annotation.DrawableRes
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
-import java.util.LinkedList
 import kotlin.math.abs
 import kotlin.math.max
+import java.util.LinkedList
 
 fun List<SwipeHelper.UnderlayButton>.intrinsicWidth(): Float {
     if (isEmpty()) return 0.0f
@@ -47,7 +47,6 @@ abstract class SwipeHelper(private val recyclerView: RecyclerView) :
         recoverSwipedItem()
         true
     }
-
 
     init {
         recyclerView.setOnTouchListener(touchListener)
@@ -125,7 +124,7 @@ abstract class SwipeHelper(private val recyclerView: RecyclerView) :
     }
 
     override fun getSwipeEscapeVelocity(defaultValue: Float): Float {
-        Log.d("AAA", "вызвали getSwipeEscapeVelocity $defaultValue")
+        Log.d("AAA", "виклик getSwipeEscapeVelocity $defaultValue")
         return  defaultValue
     }
 
@@ -134,7 +133,7 @@ abstract class SwipeHelper(private val recyclerView: RecyclerView) :
         val position = viewHolder.adapterPosition
         val progress = swipeProgressMap.getOrDefault(position, 0f)
         val swipeThreshold = if (progress > 0.4) 1f else 0.05f
-        Log.d("AAA", "вызвали getSwipeThreshold $swipeThreshold")
+        Log.d("AAA", "виклик getSwipeThreshold $swipeThreshold")
         return swipeThreshold
     }
 
@@ -144,7 +143,7 @@ abstract class SwipeHelper(private val recyclerView: RecyclerView) :
     }
 
     override fun getSwipeVelocityThreshold(defaultValue: Float): Float {
-        Log.d("AAA", "вызвали getSwipeVelocityThreshold $defaultValue")
+        Log.d("AAA", "виклик getSwipeVelocityThreshold $defaultValue")
         return defaultValue
     }
     override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
@@ -187,19 +186,16 @@ abstract class SwipeHelper(private val recyclerView: RecyclerView) :
         }
 
         fun onDraw(canvas: Canvas, rect: RectF) {
-
             val paint = Paint()
 
-            // Фон
+            // фон кнопки
             paint.color = ContextCompat.getColor(context, colorRes)
             canvas.drawRect(rect, paint)
 
-
-            // Расчет размера иконки
+            // розмір іконки
             val iconLeft = rect.left + (rect.width() - iconSizeInPixel) / 2
             val iconTop = rect.top + (rect.height() * 0.8f - iconSizeInPixel) / 2
 
-            // Отрисовка иконки
             iconRes?.let {
                 val drawable = ContextCompat.getDrawable(context, it)
                 drawable?.let { icon ->
@@ -221,14 +217,12 @@ abstract class SwipeHelper(private val recyclerView: RecyclerView) :
             val titleBounds = Rect()
             paint.getTextBounds(title, 0, title.length, titleBounds)
 
-            // Отрисовка текста под иконкой с одинаковым отступом от верхней и нижней границы кнопки
-            val textTop = iconTop + iconSizeInPixel + (verticalPadding / 2 ) // Расстояние от верха кнопки до верха текста
+            // текст іконки
+            val textTop = iconTop + iconSizeInPixel + (verticalPadding / 2 )
             val textY = textTop + titleBounds.height()
             canvas.drawText(title, rect.centerX(), textY, paint)
 
-
             clickableRegion = rect
-
         }
 
         fun handle(event: MotionEvent) {
@@ -238,8 +232,6 @@ abstract class SwipeHelper(private val recyclerView: RecyclerView) :
                 }
             }
         }
-
-
     }
     override fun getSwipeDirs(
         recyclerView: RecyclerView,
@@ -249,7 +241,7 @@ abstract class SwipeHelper(private val recyclerView: RecyclerView) :
         val adapter = recyclerView.adapter ?: return 0
 
         if (adapter.getItemViewType(position) == BookAdapter.Companion.VIEW_TYPE_HEADER) {
-            return 0 // отключить свайп для заголовков
+            return 0 // відключення свайпу для заголовку
         }
 
         return super.getSwipeDirs(recyclerView, viewHolder)

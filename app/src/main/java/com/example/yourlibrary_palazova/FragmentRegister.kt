@@ -2,6 +2,7 @@ package com.example.yourlibrary_palazova
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -40,7 +41,7 @@ class FragmentRegister : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_register, container, false)
 
-        // Поля
+        // поля
         fullNameEditText = view.findViewById(R.id.inputEditTextName)
         usernameEditText = view.findViewById(R.id.inputEditTextNickname)
         emailEditText = view.findViewById(R.id.inputEditTextEmail)
@@ -53,7 +54,6 @@ class FragmentRegister : Fragment() {
         emailLayout = view.findViewById(R.id.textInputLayout3)
         passwordLayout = view.findViewById(R.id.textInputLayout4)
 
-
         registerButton.setOnClickListener {
             clearErrors()
 
@@ -64,7 +64,7 @@ class FragmentRegister : Fragment() {
 
             var isValid = true
 
-            // Проверка fullName
+            // перевірка fullName
             val nameParts = fullName.split(" ")
             val nameHasDigits = fullName.any { it.isDigit() }
             val nameHasInvalidChars = fullName.any { !it.isLetter() && it != '-' && it != ' ' }
@@ -84,21 +84,21 @@ class FragmentRegister : Fragment() {
                 }
             }
 
-            // Проверка username
+            // перевірка username
             val usernameRegex = "^[a-zA-Z0-9@\$*()_\\-]+$".toRegex()
             if (!username.matches(usernameRegex)) {
                 usernameLayout.error = "Дозволені лише латинські літери, цифри та символи @\$*()_-"
                 isValid = false
             }
 
-            // Проверка email
+            // перевірка email
             val emailRegex = "^[a-zA-Z0-9._-]+@[a-z]+\\.[a-z]+$".toRegex()
             if (!email.matches(emailRegex)) {
                 emailLayout.error = "Невірний формат email"
                 isValid = false
             }
 
-            // Проверка пароля
+            // перевірка пароля
             if (password.length < 6) {
                 passwordLayout.error = "Пароль має бути не менше 6 символів"
                 isValid = false
@@ -119,6 +119,7 @@ class FragmentRegister : Fragment() {
 
         }
 
+        // обробка переходу на сторінку входу
         val loginTextView: TextView = view.findViewById(R.id.textViewLink)
         loginTextView.setOnClickListener {
             parentFragmentManager.beginTransaction()
@@ -126,11 +127,10 @@ class FragmentRegister : Fragment() {
                 .addToBackStack(null)
                 .commit()
         }
-
-
         return view
     }
 
+    // очищення попередніх помилок
     private fun clearErrors() {
         fullNameLayout.error = null
         usernameLayout.error = null
@@ -139,6 +139,7 @@ class FragmentRegister : Fragment() {
     }
 
 
+    // реєстрація користувача через FirebaseAuth
     private fun registerUser(fullName: String, username: String, email: String, password: String) {
         // Регистрируем пользователя с почтой и паролем
         auth.createUserWithEmailAndPassword(email, password)
@@ -162,6 +163,7 @@ class FragmentRegister : Fragment() {
             }
     }
 
+    // збереження даниз у Firestore
     private fun saveUserData(user: FirebaseUser, fullName: String, username: String) {
         val userData = hashMapOf(
             "fullName" to fullName,
@@ -170,7 +172,6 @@ class FragmentRegister : Fragment() {
             "photoUrl" to user.photoUrl?.toString()
         )
 
-        // Сохраняем данные в Firestore
         db.collection("users").document(user.uid).set(userData)
             .addOnSuccessListener {
                 val profileUpdates = UserProfileChangeRequest.Builder()
@@ -186,12 +187,7 @@ class FragmentRegister : Fragment() {
                 }
             }
             .addOnFailureListener { e ->
-                Toast.makeText(context, "Помилка: ${e.message}", Toast.LENGTH_SHORT).show()
+                Log.d("Fragment Register", "Помилка: ${e.message}")
             }
     }
-
-
-
-
-
 }

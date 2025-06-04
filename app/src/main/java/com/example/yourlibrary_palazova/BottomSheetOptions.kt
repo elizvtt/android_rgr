@@ -14,7 +14,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
-import android.widget.ArrayAdapter
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
@@ -22,13 +21,13 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
+import androidx.core.graphics.toColorInt
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.firebase.auth.FirebaseAuth
-import java.io.File
-import androidx.core.graphics.toColorInt
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
 import java.io.FileOutputStream
+import java.io.File
 
 
 class BottomSheetOptions : BottomSheetDialogFragment() {
@@ -36,24 +35,22 @@ class BottomSheetOptions : BottomSheetDialogFragment() {
     private var imageUri: Uri? = null
     private var listener: AvatarUpdateListener? = null
 
-    // launcher для запроса разрешения камеры
+    // launcher для запиту дозволу камери
     private val requestPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
             if (isGranted) {
                 openCamera()
-            } else {
-                Toast.makeText(context, "Дозвіл на камеру відхилено", Toast.LENGTH_SHORT).show()
-            }
+            } else Toast.makeText(context, "Дозвіл на камеру відхилено", Toast.LENGTH_SHORT).show()
         }
 
-    // Launcher для камеры
+    // launcher для камери
     private val cameraLauncher = registerForActivityResult(ActivityResultContracts.TakePicture()) { success ->
         if (success) {
             imageUri?.let { saveImageFromUriToInternalStorage(it) }
         }
     }
 
-    // Launcher для галереи
+    // launcher для галереи
     private val galleryLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         uri?.let { saveImageFromUriToInternalStorage(it) }
     }
@@ -62,6 +59,7 @@ class BottomSheetOptions : BottomSheetDialogFragment() {
         fun onAvatarDeleted()
     }
 
+    // встановлення слухача для повідомлень про оновлення аватару
     fun setAvatarUpdateListener(listener: AvatarUpdateListener) {
         this.listener = listener
     }
@@ -83,6 +81,7 @@ class BottomSheetOptions : BottomSheetDialogFragment() {
         val editProfile = view.findViewById<LinearLayout>(R.id.profileEditLayout)
         val signOut = view.findViewById<TextView>(R.id.signOut)
 
+        // обробник натискання кнопки "додаи фото"
         photoAdd.setOnClickListener {
             val options = arrayOf("Зробити фото", "Обрати фото", "Видалити фото")
             val dialog = AlertDialog.Builder(requireContext(), R.style.CustomDialogStyle)
@@ -104,11 +103,13 @@ class BottomSheetOptions : BottomSheetDialogFragment() {
             )
         }
 
+        // обробник редагування профілю
         editProfile.setOnClickListener {
-            Toast.makeText(context, "Edit", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, "Редагуання профілю поки недоступне, чекайте згодом!", Toast.LENGTH_SHORT).show()
             dismiss()
         }
 
+        // обробник виходу з акаунту
         signOut.setOnClickListener {
             val dialog = AlertDialog.Builder(requireContext(), R.style.CustomDialogStyle)
                 .setTitle("Підтвердити вихід")
@@ -145,7 +146,6 @@ class BottomSheetOptions : BottomSheetDialogFragment() {
                 WindowManager.LayoutParams.WRAP_CONTENT
             )
         }
-
     }
 
     private fun openCamera() {
@@ -155,15 +155,15 @@ class BottomSheetOptions : BottomSheetDialogFragment() {
     }
 
     private fun openGallery() {
-        // MIME тип изображения
         galleryLauncher.launch("image/*")
     }
 
+    // збереження фото у внутрішне сховище
     private fun saveImageFromUriToInternalStorage(uri: Uri) {
         val user = FirebaseAuth.getInstance().currentUser ?: return
         val context = requireContext()
 
-        // Получаем bitmap из Uri
+        // отримуємо bitmap з Uri
         val bitmap = ImageUtils.getCorrectlyOrientedBitmap(uri, context)
 
         if (bitmap == null) {
@@ -172,20 +172,19 @@ class BottomSheetOptions : BottomSheetDialogFragment() {
             return
         }
 
-        // Имя файла, можно задать по UID пользователя
-        val filename = "avatar_${user.uid}.jpg"
+        val filename = "avatar_${user.uid}.jpg" // ім'я файлу для аватару базується на uid користувача
 
-        // Сохраняем bitmap в Internal Storage
+        // збереження bitmap у внутрішнє сховище
         val savedPath = saveImageToInternalStorage(context, bitmap, filename)
 
-        // Сохраняем путь к файлу в Firestore
+        // збереження шляху до фото у Firestore
         saveAvatarPathToFirestore(user.uid, savedPath)
 
         Toast.makeText(context, "Аватар оновлено", Toast.LENGTH_SHORT).show()
         dismiss()
     }
 
-    // Функция сохранения bitmap в Internal Storage
+    // функція збереження bitmap у внутрішнє сховище
     private fun saveImageToInternalStorage(context: Context, bitmap: Bitmap, filename: String): String {
         val file = File(context.filesDir, filename)
         FileOutputStream(file).use { fos ->
@@ -194,7 +193,7 @@ class BottomSheetOptions : BottomSheetDialogFragment() {
         return file.absolutePath
     }
 
-    // Сохраняем путь в Firestore в коллекцию "users"
+    // Збереження шляху зображення у Firestore
     private fun saveAvatarPathToFirestore(userId: String, path: String) {
         val db = FirebaseFirestore.getInstance()
         val userRef = db.collection("users").document(userId)
@@ -202,6 +201,7 @@ class BottomSheetOptions : BottomSheetDialogFragment() {
         userRef.set(data, SetOptions.merge())
     }
 
+    // перевірка дозволу на камеру
     private fun checkCameraPermissionAndOpen() {
         when {
             ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED -> {
@@ -214,6 +214,7 @@ class BottomSheetOptions : BottomSheetDialogFragment() {
         }
     }
 
+    // видалення аватарки
     private fun deleteAvatarPhoto() {
         val user = FirebaseAuth.getInstance().currentUser ?: return
         val context = requireContext()
@@ -221,7 +222,7 @@ class BottomSheetOptions : BottomSheetDialogFragment() {
         val db = FirebaseFirestore.getInstance()
         val userRef = db.collection("users").document(user.uid)
 
-        // Сначала получаем текущий путь, чтобы удалить файл локально
+        // отримуємо поточний шлях, щоб видалити локальний файл
         userRef.get().addOnSuccessListener { doc ->
             val photoPath = doc.getString("photoUrl")
             if (photoPath != null) {
@@ -232,7 +233,7 @@ class BottomSheetOptions : BottomSheetDialogFragment() {
                 }
             }
 
-            // Обновляем Firestore, очищая поле photoUrl
+            // очищаємо поле photoUrl у Firestore
             userRef.update("photoUrl", null)
                 .addOnSuccessListener {
                     Toast.makeText(context, "Фото профілю видалено", Toast.LENGTH_SHORT).show()

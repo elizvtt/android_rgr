@@ -1,5 +1,7 @@
 package com.example.yourlibrary_palazova
 
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.LiveData
@@ -7,24 +9,31 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.SetOptions
+import java.io.File
 
 class BooksViewModel : ViewModel() {
 
     private val auth = FirebaseAuth.getInstance()
     private val db = FirebaseFirestore.getInstance()
 
+    // LiveData зі списком книг
     private val _books = MutableLiveData<List<Book>>()
     val books: LiveData<List<Book>> get() = _books
 
+    // LiveData для вибраної книги
     private val _selectedBook = MutableLiveData<Book?>()
     val selectedBook: LiveData<Book?> get() = _selectedBook
 
+    // LiveData для аватарки користувача
+    private val _avatarBitmap = MutableLiveData<Bitmap?>()
+    val avatarBitmap: LiveData<Bitmap?> get() = _avatarBitmap
 
     init {
         loadBooks()
     }
 
-
+    // завантаження списку книг з Firestore
     fun loadBooks() {
         val user = auth.currentUser
         if (user == null) {
@@ -45,7 +54,7 @@ class BooksViewModel : ViewModel() {
             }
     }
 
-
+    // додаємо нову книгу до Firestore та оновлюємо список
     fun addBook(
         book: Book,
         onSuccess: () -> Unit,
@@ -56,13 +65,13 @@ class BooksViewModel : ViewModel() {
             .document(user.uid)
             .collection("books")
 
-        // Создаём новый документ с заранее сгенерированным ID
+        // Генеруємо унікальний ID
         val newDocRef = booksRef.document()
         val bookWithId = book.copy(id = newDocRef.id)
 
         newDocRef.set(bookWithId)
             .addOnSuccessListener {
-                loadBooks()  // Обновляем список книг
+                loadBooks()
                 onSuccess()
             }
             .addOnFailureListener { e ->
@@ -70,7 +79,7 @@ class BooksViewModel : ViewModel() {
             }
     }
 
-
+    // видаляємо книгу за ID та оновлюємо список
     fun deleteBook(
         bookId: String,
         onSuccess: () -> Unit,
@@ -84,7 +93,7 @@ class BooksViewModel : ViewModel() {
 
         bookDocRef.delete()
             .addOnSuccessListener {
-                loadBooks()  // Обновляем список книг после удаления
+                loadBooks()
                 onSuccess()
             }
             .addOnFailureListener { e ->
@@ -92,6 +101,7 @@ class BooksViewModel : ViewModel() {
             }
     }
 
+    // оновлення інформації про книгу
     fun updateBook (
         bookId: String,
         updatedBook: Book,
@@ -109,6 +119,7 @@ class BooksViewModel : ViewModel() {
             .addOnFailureListener { onFailure(it) }
     }
 
+    // завантажуємо деталі конкретної книги за її ID
     fun loadBookDetails(bookId: String) {
         val user = auth.currentUser ?: return
 
@@ -120,7 +131,7 @@ class BooksViewModel : ViewModel() {
             .addOnSuccessListener { document ->
                 if (document != null && document.exists()) {
                     val book = document.toObject(Book::class.java)
-                    _selectedBook.value = book
+                    _selectedBook.value = book // оновлюємо LiveData зі вибраною книгою
                 } else {
                     _selectedBook.value = null
                     Log.d("BooksViewModel", "Книга не знайдена")
@@ -132,6 +143,7 @@ class BooksViewModel : ViewModel() {
             }
     }
 
+    // оновлюємо статус обраної книги
     fun updateFavoriteStatus(
         bookId: String,
         isFavorite: Boolean,
@@ -149,6 +161,7 @@ class BooksViewModel : ViewModel() {
             .addOnFailureListener { onFailure(it) }
     }
 
+    // оновлюємо URI обкладинки книги у Firestore
     fun updateCover(
         bookId: String,
         coverUri: Uri?,
@@ -168,8 +181,46 @@ class BooksViewModel : ViewModel() {
         bookDocRef.update(updateData)
             .addOnSuccessListener { onSuccess() }
             .addOnFailureListener { exception -> onFailure(exception) }
-
     }
 
+    // збереження шляху обкладинки
+    fun saveCoverPath(
+        bookId: String,
+        path: String,
+        onSuccess: () -> Unit,
+        onFailure: (Throwable) -> Unit
+    ) {
+        val user = auth.currentUser ?: return
+        val bookRef = db.collection("users")
+            .document(user.uid)
+            .collection("books")
+            .document(bookId)
 
+        val data = mapOf("coverUri" to path)
+        bookRef.set(data, SetOptions.merge())
+            .addOnSuccessListener { onSuccess() }
+            .addOnFailureListener { onFailure(it) }
+    }
+
+    fun loadAvatar(userId: String) {
+        val db = FirebaseFirestore.getInstance()
+        db.collection("users").document(userId).get()
+            .addOnSuccessListener { doc ->
+                val path = doc.getString("photoUrl")
+                if (path != null) {
+                    val file = File(path)
+                    if (file.exists()) {
+                        val bitmap = BitmapFactory.decodeFile(file.absolutePath)
+                        _avatarBitmap.value = bitmap
+                    } else {
+                        _avatarBitmap.value = null
+                    }
+                } else {
+                    _avatarBitmap.value = null
+                }
+            }
+            .addOnFailureListener {
+                _avatarBitmap.value = null
+            }
+    }
 }

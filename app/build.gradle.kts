@@ -52,6 +52,7 @@ dependencies {
     implementation(libs.roundedimageview)
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
+    implementation(libs.androidx.exifinterface)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

@@ -27,6 +27,7 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.core.graphics.toColorInt
 import androidx.recyclerview.widget.RecyclerView
+import androidx.core.content.edit
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.firebase.auth.FirebaseAuth
 import kotlin.text.lowercase
@@ -41,13 +42,14 @@ class FragmentHome : Fragment() {
 
     private val addBookLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
-            booksViewModel.loadBooks() // обновляем список книг после успешного добавления
+            booksViewModel.loadBooks()
         }
     }
 
-    private val bookList = mutableListOf<Book>()
-    private val allBooks = mutableListOf<Book>()
+    private val bookList = mutableListOf<Book>() // відфільтровані книги для показу
+    private val allBooks = mutableListOf<Book>() // повний список книг
 
+    // поточні значення фільтрів
     private var currentOnlyFavorites = false
     private var currentOnlyCompleted = false
     private var currentOnlyQuotes = false
@@ -65,6 +67,7 @@ class FragmentHome : Fragment() {
         booksViewModel = ViewModelProvider(requireActivity())[BooksViewModel::class.java]
 
         bookAdapter = BookAdapter(bookList, object : BookAdapter.HeaderClickListener {
+            // обробка натискання на кнопку фільтрації
             override fun onFilterClicked() {
                 val dialogView =
                     LayoutInflater.from(requireContext()).inflate(R.layout.dialog_filter, null)
@@ -89,6 +92,7 @@ class FragmentHome : Fragment() {
                     override fun onStopTrackingTouch(seekBar: SeekBar?) {}
                 })
 
+                // діалогове вікно з фільтрами
                 val dialog = AlertDialog.Builder(requireContext(), R.style.ThemeOverlay_App_FilterDialog)
                         .setView(dialogView)
                         .setPositiveButton("Застосувати") { _, _ ->
@@ -108,7 +112,7 @@ class FragmentHome : Fragment() {
                             val filtersList = buildActiveFiltersList()
 
                             if (noFiltersSelected) {
-                                filterBooks() // Показать все книги
+                                filterBooks()
                                 bookAdapter.updateActiveFilters(filtersList)
                             } else {
                                 filterBooks(
@@ -125,6 +129,7 @@ class FragmentHome : Fragment() {
                             }
                         }
 
+                        // скидання фільтрів
                         .setNegativeButton("Скасувати") { dialogInterface: DialogInterface, _ ->
                             currentOnlyFavorites = false
                             currentOnlyCompleted = false
@@ -139,6 +144,7 @@ class FragmentHome : Fragment() {
                         }
                         .create()
 
+                // відновлення стану діалогу
                 checkFavorites.isChecked = currentOnlyFavorites
                 checkCompleted.isChecked = currentOnlyCompleted
                 checkQuotes.isChecked = currentOnlyQuotes
@@ -154,11 +160,13 @@ class FragmentHome : Fragment() {
 
             }
 
+            // обробка натискання кнопки сортування
             override fun onSortClicked() {
                 setupSortPopup()
             }
         },
             object : BookAdapter.OnBookClickListener {
+                // при натисканні на елемент списку відправляємо BOOK_ID для відкриття сторінки книги
                 override fun onBookClick(book: Book) {
                     val intent = Intent(requireContext(), ActivityBookPage::class.java)
                     intent.putExtra("BOOK_ID", book.id)
@@ -167,14 +175,13 @@ class FragmentHome : Fragment() {
             }
         )
 
+        // Застосування збережених налаштувань сортування
         applySavedSortPreferences()
         bookAdapter.notifyDataSetChanged()
-
 
         recyclerView = view.findViewById(R.id.recyclerView)
         recyclerView.layoutManager = LinearLayoutManager(context)
         recyclerView.adapter = bookAdapter
-
 
         booksViewModel.books.observe(viewLifecycleOwner) { books ->
             allBooks.clear()
@@ -189,6 +196,7 @@ class FragmentHome : Fragment() {
             )
         }
 
+        // додавання книги кнопку
         val fabAddBook = view.findViewById<FloatingActionButton>(R.id.floatingActionButton)
 
         fabAddBook.setOnClickListener {
@@ -258,13 +266,13 @@ class FragmentHome : Fragment() {
                                             setTextColor(Color.RED)
                                             setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
                                         }
-//
+
                                         dialog.getButton(AlertDialog.BUTTON_NEGATIVE).apply {
                                             setTextColor("#241203".toColorInt())
                                             setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
                                         }
 
-                                    } else Log.d("Fragment Home", "Помилка: невірна позиція ${position}")
+                                    } else Log.d("Fragment Home", "Помилка: невірна позиція $position")
                                 }
                             }
                         )
@@ -450,10 +458,10 @@ class FragmentHome : Fragment() {
                 0
             }
 
-            prefs.edit()
-                .putInt("sortOption", selectedOption)
-                .putInt("sortOrder", sortOrder)
-                .apply()
+             prefs.edit {
+                 putInt("sortOption", selectedOption)
+                     .putInt("sortOrder", sortOrder)
+             }
 
             when (selectedOption) {
                 0 -> sortBooksByTitle(sortOrder == 0)

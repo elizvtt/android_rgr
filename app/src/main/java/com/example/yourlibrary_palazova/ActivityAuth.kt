@@ -7,23 +7,22 @@ class ActivityAuth : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_auth)
+        setContentView(R.layout.activity_auth) // підключаємо xml
 
-        val action = intent.getStringExtra("action")
+        val action = intent.getStringExtra("action") // отримуємо action
 
         if (action == "signUp") {
-            // Переход на экран регистрации
+            // якщо signUp, то переходимо до екрану реєстрації
             supportFragmentManager.beginTransaction()
                 .replace(R.id.authFragmentContainer, FragmentRegister())
                 .commit()
         } else if (action == "logIn") {
-            // Переход на экран входа
+            // якщо logIn, то переходимо до екрану входу
             supportFragmentManager.beginTransaction()
                 .replace(R.id.authFragmentContainer, FragmentLogin())
                 .commit()
         }
     }
-
 }
 
 

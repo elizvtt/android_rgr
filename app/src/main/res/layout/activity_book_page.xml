@@ -49,6 +49,7 @@
                     android:layout_height="wrap_content"
                     android:background="@null"
                     android:padding="8dp"
+                    android:contentDescription="Повернутися назад"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
@@ -78,6 +79,7 @@
                     android:layout_marginEnd="4dp"
                     android:background="@null"
                     android:padding="8dp"
+                    android:contentDescription="Додати до Обраного"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
@@ -117,6 +119,7 @@
                 android:layout_marginEnd="20dp"
                 android:background="@null"
                 android:padding="5dp"
+                android:contentDescription="Редагувати"
                 app:srcCompat="@drawable/icon_update"/>
 
             <TextView

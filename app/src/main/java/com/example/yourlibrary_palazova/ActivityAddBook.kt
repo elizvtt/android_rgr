@@ -20,8 +20,8 @@ class ActivityAddBook : AppCompatActivity() {
     private lateinit var binding: ActivityAddBookBinding
     private val booksViewModel: BooksViewModel by viewModels()
 
-    private var favoritesStatus: Boolean = false
-    private var coverUri: Uri? = null
+    private var favoritesStatus: Boolean = false // статус для обраних книг
+    private var coverUri: Uri? = null // uri обкладинки
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,9 +30,11 @@ class ActivityAddBook : AppCompatActivity() {
 
         setupDatePickers() // відкриття Date Pickers
 
+        // зчитування action
         val action = intent.getStringExtra("action")
         val bookId = intent.getStringExtra("bookId")
 
+        // якщо передано "редагувати книгу"
         if (action == "edit book") {
             Log.d("BookEdit", "Action: $action")
             Log.d("BookEdit", "BookId: $bookId")
@@ -42,12 +44,12 @@ class ActivityAddBook : AppCompatActivity() {
             binding.pageTitle.text = "Редагувати"
             binding.addBook.text = "Зберегти зміни"
 
-            // Заблокировать неизменяемые поля
+            // блокуємо поля які не можна змінювати
             binding.textInputTitle.isEnabled = false
             binding.textInputAuthor.isEnabled = false
             binding.textInputStart.isEnabled = false
 
-            // Установить значения в поля
+            // заповнюємо поля даними з Intent
             binding.textInputTitle.setText(intent.getStringExtra("title"))
             binding.textInputAuthor.setText(intent.getStringExtra("author"))
             binding.textInputStart.setText(intent.getStringExtra("startDate"))
@@ -62,11 +64,14 @@ class ActivityAddBook : AppCompatActivity() {
             binding.textInputDescription.setText(quotes)
             binding.textInputNotes.setText(notes)
 
+            // збереження статусу "Обране" та обкладинки
             favoritesStatus = intent.getBooleanExtra("favorites", false)
             coverUri = intent.getStringExtra("coverUri")?.toUri()
         }
 
+        // обробник кнопки додати
         binding.addBook.setOnClickListener {
+            // зчитування значень з форми
             val title = binding.textInputTitle.text.toString().trim()
             val author = binding.textInputAuthor.text.toString().trim()
             val startDate = binding.textInputStart.text.toString().trim()
@@ -77,13 +82,14 @@ class ActivityAddBook : AppCompatActivity() {
             val notesList = binding.textInputNotes.text.toString()
                 .lines().map { it.trim() }.filter { it.isNotBlank() }
 
-            // Очистка предыдущих ошибок
+            // Очистка попередніх помилок
             binding.textInputLayout5.error = null
             binding.textInputLayout6.error = null
             binding.textInputLayout7.error = null
 
             var hasError = false
 
+            // перевірка для обов'язкових полів
             if (author.isBlank()) {
                 binding.textInputLayout5.error = "Введіть автора"
                 hasError = true
@@ -101,6 +107,7 @@ class ActivityAddBook : AppCompatActivity() {
 
 
             if (action == "edit book" && bookId != null) {
+                // оновлення існуючої книги
                 val updatedBook = Book(
                     id = bookId,
                     title = title,
@@ -118,7 +125,7 @@ class ActivityAddBook : AppCompatActivity() {
                     bookId = bookId,
                     updatedBook = updatedBook,
                     onSuccess = {
-                        Log.d("UpdateBook", "Книга ${bookId}  успішно оновлена")
+                        Log.d("UpdateBook", "Книга $bookId  успішно оновлена")
                         Toast.makeText(this, "Книгу оновлено", Toast.LENGTH_SHORT).show()
                         setResult(Activity.RESULT_OK)
                         finish()
@@ -128,6 +135,7 @@ class ActivityAddBook : AppCompatActivity() {
                     }
                 )
             } else {
+                // додавання нової книги
                 val newBook = Book(
                     title = title,
                     author = author,
@@ -154,6 +162,7 @@ class ActivityAddBook : AppCompatActivity() {
         }
     }
 
+    // налаштування DatePicker для вибору дат
     private fun setupDatePickers() {
         val dateFormatter = SimpleDateFormat("dd.MM.yy", Locale.getDefault())
 
@@ -171,10 +180,12 @@ class ActivityAddBook : AppCompatActivity() {
             }
         }
 
+        // відкриття DatePicker для дати початку
         binding.textInputStart.setOnClickListener {
             showDatePicker { date -> binding.textInputStart.setText(date) }
         }
 
+        // відкриття DatePicker для дати завершенню + перевірка дати
         binding.textInputFinish.setOnClickListener {
             showDatePicker { selectedDate ->
                 val startText = binding.textInputStart.text.toString()

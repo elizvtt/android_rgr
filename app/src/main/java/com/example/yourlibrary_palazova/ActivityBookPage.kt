@@ -10,8 +10,6 @@ import android.view.View
 import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
 import android.app.Activity
 import android.app.AlertDialog
 import android.content.Context
@@ -19,23 +17,28 @@ import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Matrix
-import android.media.ExifInterface
 import android.net.Uri
 import android.view.ContextThemeWrapper
 import android.view.WindowManager
 import android.widget.PopupMenu
 import android.widget.Toast
+import androidx.exifinterface.media.ExifInterface
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.lifecycle.ViewModelProvider
-import me.zhanghai.android.materialratingbar.MaterialRatingBar
 import androidx.core.view.isGone
-import java.io.File
-import androidx.core.net.toUri
+import com.example.yourlibrary_palazova.helpers.ImageUtils
+import me.zhanghai.android.materialratingbar.MaterialRatingBar
 import com.makeramen.roundedimageview.RoundedImageView
+import java.io.File
+import java.io.FileOutputStream
 
 class ActivityBookPage : AppCompatActivity() {
+
+    private lateinit var viewModel: BooksViewModel
 
     private lateinit var bookId: String
     private lateinit var currentBook: Book
@@ -45,38 +48,38 @@ class ActivityBookPage : AppCompatActivity() {
 
     private var toast: Toast? = null
 
-    // launcher для запроса разрешения камеры
+    // launcher для запиту дозволу на використання камери
     private val requestPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
             if (isGranted) {
-                openCamera()
+                openCamera() // якщо дозвіл отримано відкриваємо камеру
             } else {
                 Toast.makeText(this, "Дозвіл на камеру відхилено", Toast.LENGTH_SHORT).show()
             }
         }
 
-    // Launcher для камеры
+    // Launcher для фотографування
     private val cameraLauncher = registerForActivityResult(ActivityResultContracts.TakePicture()) { success ->
         if (success) {
-            coverUri?.let { saveImageFromUriToInternalStorage(it) }
+            coverUri?.let { uri -> saveBookCoverFromUriToInternalStorage(uri, bookId) }
         }
     }
 
-    // Launcher для галереи
+    // Launcher для вибору зображення з галереї
     private val galleryLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
-        if (uri != null) {
-            coverUri = uri // обязательно сохраняем uri выбранной картинки
-            saveImageFromUriToInternalStorage(uri)
-        }
+        uri?.let { selectedUri ->
+            coverUri = selectedUri
+            saveBookCoverFromUriToInternalStorage(selectedUri, bookId) }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_book_page)
 
+        // отримуємо ID книги з інтенту
         bookId = intent.getStringExtra("BOOK_ID") ?: ""
 
-        val viewModel = ViewModelProvider(this)[BooksViewModel::class.java]
+        viewModel = ViewModelProvider(this)[BooksViewModel::class.java]
         val buttonEdit = findViewById<ImageButton>(R.id.imageButtonEdit)
         val buttonBack = findViewById<ImageButton>(R.id.buttonBack)
         val buttonFav = findViewById<ImageButton>(R.id.buttonFavorite)
@@ -99,11 +102,14 @@ class ActivityBookPage : AppCompatActivity() {
 
         viewModel.loadBookDetails(bookId)
 
+        // кнопка назад
         buttonBack.setOnClickListener {
             finish()
         }
 
+        // додавання до "обраного"
         buttonFav.setOnClickListener {
+            // анімація натискання
             val scaleUp = ObjectAnimator.ofPropertyValuesHolder(
                 buttonFav,
                 PropertyValuesHolder.ofFloat("scaleX", 1f, 1.3f),
@@ -137,6 +143,7 @@ class ActivityBookPage : AppCompatActivity() {
             )
         }
 
+        // кнопка редагувати
         buttonEdit.setOnClickListener {
 
             val themedContext = ContextThemeWrapper(this, R.style.PopupMenuStyle)
@@ -148,6 +155,7 @@ class ActivityBookPage : AppCompatActivity() {
                 when (item.itemId) {
                     R.id.edit_input -> {
                         val intent = Intent(this, ActivityAddBook::class.java).apply {
+                            // передаємо action edit book
                             putExtra("action", "edit book")
                             putExtra("bookId", bookId)
                             putExtra("title", currentBook.title)
@@ -156,8 +164,8 @@ class ActivityBookPage : AppCompatActivity() {
                             putExtra("endDate", currentBook.endDate)
                             putExtra("rating", currentBook.rating)
                             putExtra("favorites", currentBook.favorites)
-                            putStringArrayListExtra("notes", ArrayList(currentBook.notes ?: listOf()))
-                            putStringArrayListExtra("quotes", ArrayList(currentBook.quotes ?: listOf()))
+                            putStringArrayListExtra("notes", ArrayList(currentBook.notes))
+                            putStringArrayListExtra("quotes", ArrayList(currentBook.quotes))
                             putExtra("coverUri", currentBook.coverUri)
                         }
 
@@ -178,8 +186,7 @@ class ActivityBookPage : AppCompatActivity() {
 
         editBookLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
-                // Книга оновлена — онови дані
-                viewModel.loadBookDetails(bookId)
+                viewModel.loadBookDetails(bookId) // оновлюємо дані
             }
         }
     }
@@ -188,7 +195,7 @@ class ActivityBookPage : AppCompatActivity() {
         currentBook = book
         findViewById<TextView>(R.id.bookTitle).text = book.title
         findViewById<TextView>(R.id.bookAuthor).text = book.author
-        findViewById<TextView>(R.id.startDate).text = "Почато: ${book.startDate ?: "-"}"
+        findViewById<TextView>(R.id.startDate).text = "Почато: ${book.startDate}"
         findViewById<TextView>(R.id.endDate).text = "Прочитано: ${book.endDate ?: "-"}"
         setupRatingBar(book.rating)
         setupQuotes(book.quotes)
@@ -199,20 +206,22 @@ class ActivityBookPage : AppCompatActivity() {
         buttonFav.tag = isFavorite
         updateFavoriteIcon(buttonFav, isFavorite)
 
+        val path = book.coverUri
         val imageView = findViewById<RoundedImageView>(R.id.bookCover)
-        val uri = book.coverUri?.toUri()
-        if (uri != null) {
-            val bitmap = fixImageOrientationFromUri(this, uri)
-            if (bitmap != null) {
-                imageView.setImageBitmap(bitmap)
-            } else {
-                imageView.setImageResource(R.drawable.rounded_background)
-            }
-        } else {
-            imageView.setImageResource(R.drawable.rounded_background)
-        }
+        if (!path.isNullOrEmpty()) {
+            val file = File(path)
+
+            if (file.exists()) {
+                val bitmap = fixImageOrientationFromFile(file)  // або просто decodeFile + rotate, як у вашій утиліті
+                if (bitmap != null) {
+                    imageView.setImageBitmap(bitmap)
+                } else imageView.setImageResource(R.drawable.rounded_background)
+            } else imageView.setImageResource(R.drawable.rounded_background)
+        } else imageView.setImageResource(R.drawable.rounded_background)
+
     }
 
+    // оновлення іконки "обраного"
     private fun updateFavoriteIcon(button: ImageButton, isFavorite: Boolean) {
         button.setImageResource(
             if (isFavorite) R.drawable.icon_heart_filled
@@ -220,6 +229,7 @@ class ActivityBookPage : AppCompatActivity() {
         )
     }
 
+    // налаштування відображення RatingBar-у
     private fun setupRatingBar(rating: Int) {
         val ratingBar2 = findViewById<MaterialRatingBar>(R.id.ratingBar2)
         ratingBar2.numStars = 5
@@ -231,7 +241,7 @@ class ActivityBookPage : AppCompatActivity() {
         val quotesContainer = findViewById<LinearLayout>(R.id.quotesContainer)
         val quotesBlock = findViewById<LinearLayout>(R.id.quotesBlock)
         quotesContainer.removeAllViews()
-        if (quotes.isNullOrEmpty()) {
+        if (quotes.isNullOrEmpty()) { // Якщо список цитат пустий ховаємо quotesBlock
             quotesBlock.visibility = View.GONE
         } else {
             quotesBlock.visibility = View.VISIBLE
@@ -243,9 +253,10 @@ class ActivityBookPage : AppCompatActivity() {
             }
         }
 
-        // Кнопка сворачивания/разворачивания
+        // Кнопка розгортання/згортання
         findViewById<ImageButton>(R.id.buttonToggleQuotes).setOnClickListener {
-            if (quotesContainer.isGone) quotesContainer.visibility = View.VISIBLE else quotesContainer.visibility = View.GONE
+            if (quotesContainer.isGone) quotesContainer.visibility = View.VISIBLE
+            else quotesContainer.visibility = View.GONE
         }
     }
 
@@ -253,27 +264,25 @@ class ActivityBookPage : AppCompatActivity() {
         val notesContainer = findViewById<LinearLayout>(R.id.notesContainer)
         val notesBlock = findViewById<LinearLayout>(R.id.notesBlock)
         notesContainer.removeAllViews()
-        if (notes.isNullOrEmpty()) {
+        if (notes.isNullOrEmpty()) { // якщо нотатки пусті  ховаємо notesBlock
             notesBlock.visibility = View.GONE
         } else {
             notesBlock.visibility = View.VISIBLE
             notes.forEach { note ->
                 val textView = TextView(this)
-                textView.text = "$note"
+                textView.text = note
                 textView.setPadding(8, 4, 8, 4)
                 notesContainer.addView(textView)
             }
         }
 
         findViewById<ImageButton>(R.id.buttonToggleNotes).setOnClickListener {
-            if (notesContainer.isGone) {
-                notesContainer.visibility = View.VISIBLE
-            } else {
-                notesContainer.visibility = View.GONE
-            }
+            if (notesContainer.isGone) notesContainer.visibility = View.VISIBLE
+            else notesContainer.visibility = View.GONE
         }
     }
 
+    // діалогове вікно при додаванні обкладинки
     private fun showCoverDialog() {
         val options = arrayOf("Зробити фото", "Обрати з галереї", "Обрати з Інтернету", "Видалити обкладинку")
         val dialog = AlertDialog.Builder(this, R.style.CustomDialogStyle)
@@ -297,6 +306,11 @@ class ActivityBookPage : AppCompatActivity() {
         )
     }
 
+    private fun openInternet() {
+        Toast.makeText(this, "Функція вибору обкладинки з Інтернету поки не реалізована", Toast.LENGTH_SHORT).show()
+    }
+
+    // відкриття камери
     private fun openCamera() {
         val photoFile = File.createTempFile("cover", ".jpg", this.cacheDir)
         val uri = FileProvider.getUriForFile(this, "${this.packageName}.provider", photoFile)
@@ -304,40 +318,61 @@ class ActivityBookPage : AppCompatActivity() {
         cameraLauncher.launch(uri)
     }
 
+    // перевірка дозволу на камеру
     private fun checkCameraPermissionAndOpen() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
             openCamera()
         } else requestPermissionLauncher.launch(Manifest.permission.CAMERA)
     }
 
-    private fun openGallery() {
-        // MIME тип изображения
-        galleryLauncher.launch("image/*")
+    private fun openGallery() { galleryLauncher.launch("image/*") }
+
+    private fun saveBookCoverFromUriToInternalStorage(uri: Uri, bookId: String) {
+        val context = this
+
+        // отримуємо bitmap з Uri
+        val bitmap = ImageUtils.getCorrectlyOrientedBitmap(uri, context)
+        if (bitmap == null) {
+            Log.d("Activity Book Page", "Не вдалося обробити зображення")
+            Toast.makeText(context, "Не вдалося обробити зображення", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val filename = "cover_${bookId}.jpg" // ім'я файлу для обкладинки
+
+        // збереження bitmap у внутрішнє сховище
+        val savedPath = saveImageToInternalStorage(context, bitmap, filename)
+
+        // збереження шляху до обкладинки у Firestore
+        saveCoverPathToFirestore(bookId, savedPath)
+
+        Toast.makeText(context, "Обкладинку оновлено", Toast.LENGTH_SHORT).show()
     }
 
-    private fun saveImageFromUriToInternalStorage(uri: Uri) {
-        val viewModel = ViewModelProvider(this)[BooksViewModel::class.java]
-        // Здесь можно сделать копирование изображения в внутреннее хранилище (если нужно)
-        // И вызвать updateCover
+    private fun saveImageToInternalStorage(context: Context, bitmap: Bitmap, filename: String): String {
+        val file = File(context.filesDir, filename)
+        FileOutputStream(file).use { fos ->
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos)
+        }
+        return file.absolutePath
+    }
 
-        viewModel.updateCover(bookId, uri,
+    private fun saveCoverPathToFirestore(bookId: String, path: String) {
+        viewModel.saveCoverPath(
+            bookId = bookId,
+            path = path,
             onSuccess = {
-                Toast.makeText(this, "Обкладинка оновлена", Toast.LENGTH_SHORT).show()
-                viewModel.loadBookDetails(bookId) // обновить UI
+                Toast.makeText(this, "Обкладинку оновлено", Toast.LENGTH_SHORT).show()
+                viewModel.loadBookDetails(bookId)
             },
-            onFailure = {
-                Log.d("Activity Book Page", "Не вдалося оновити обкладинку")
+            onFailure = { error ->
+                Log.e("ActivityBookPage", "Не вдалося зберегти обкладинку: ${error.message}")
+                Toast.makeText(this, "Помилка збереження обкладинки", Toast.LENGTH_SHORT).show()
             }
         )
     }
 
-    private fun openInternet() {
-        // TODO: Реализовать выбор обложки из интернета
-        Toast.makeText(this, "Функція вибору обкладинки з Інтернету поки не реалізована", Toast.LENGTH_SHORT).show()
-    }
-
     private fun deleteCover() {
-        val viewModel = ViewModelProvider(this)[BooksViewModel::class.java]
         viewModel.updateCover(bookId, null,
             onSuccess = {
                 Toast.makeText(this, "Обкладинку видалено", Toast.LENGTH_SHORT).show()
@@ -349,23 +384,15 @@ class ActivityBookPage : AppCompatActivity() {
         )
     }
 
-    fun fixImageOrientationFromUri(context: Context, uri: Uri): Bitmap? {
+    fun fixImageOrientationFromFile(file: File): Bitmap? {
         return try {
-            // Получаем EXIF-информацию
-            val exifStream = context.contentResolver.openInputStream(uri)
-            val exif = exifStream?.use { ExifInterface(it) }
-
-            // Получаем ориентацию
-            val orientation = exif?.getAttributeInt(
+            val exif = ExifInterface(file.absolutePath)
+            val orientation = exif.getAttributeInt(
                 ExifInterface.TAG_ORIENTATION,
                 ExifInterface.ORIENTATION_NORMAL
-            ) ?: ExifInterface.ORIENTATION_NORMAL
+            )
 
-            // Повторно открываем поток для изображения (т.к. первый уже был использован)
-            val imageStream = context.contentResolver.openInputStream(uri)
-            val originalBitmap = imageStream?.use { BitmapFactory.decodeStream(it) }
-
-            if (originalBitmap == null) return null
+            val originalBitmap = BitmapFactory.decodeFile(file.absolutePath) ?: return null
 
             val matrix = Matrix()
             when (orientation) {
@@ -384,6 +411,5 @@ class ActivityBookPage : AppCompatActivity() {
             null
         }
     }
-
 
 }

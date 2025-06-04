@@ -1,6 +1,5 @@
 package com.example.yourlibrary_palazova
 
-
 import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
@@ -12,6 +11,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
+import androidx.core.graphics.toColorInt
 
 class BookAdapter(
     private val books: MutableList<Book>,
@@ -19,36 +19,40 @@ class BookAdapter(
     private val bookClickListener: OnBookClickListener
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
+    // інтерфейс для обробки кліків по кнопках фільтра та сортування у заголовку списку
     interface HeaderClickListener {
         fun onFilterClicked()
         fun onSortClicked()
     }
 
+    // інтерфейс для обробки кліків на окремих книгах у списку
     interface OnBookClickListener {
         fun onBookClick(book: Book)
     }
 
-
+    // відображення у заголовку списку активних фільтрів
     private var activeFiltersList: List<String> = emptyList()
 
-
+    // ViewHolder для рядка книги
     inner class BookViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val titleText: TextView = itemView.findViewById(R.id.bookName)
         val dateText: TextView = itemView.findViewById(R.id.bookData)
         val ratingText: TextView = itemView.findViewById(R.id.bookRating)
     }
 
+    // ViewHolder для заголовка списку
     inner class HeaderViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val filterButton: ImageButton = itemView.findViewById(R.id.buttonFilter)
         private val sortButton: ImageButton = itemView.findViewById(R.id.buttonSort)
         private val activeFiltersLayout: LinearLayout = itemView.findViewById(R.id.activeFiltersLayout)
 
-
         init {
+            // якщо користувач не увійшов у систему, приховуємо кнопки фільтрації та сортування
             if (!isUserLoggedIn()) {
                 filterButton.visibility = View.GONE
                 sortButton.visibility = View.GONE
             } else {
+                // якщо увійшов - додаємо обробники на кнопки
                 filterButton.setOnClickListener {
                     headerClickListener.onFilterClicked()
                 }
@@ -59,6 +63,7 @@ class BookAdapter(
             }
         }
 
+        // метод для оновлення відображення активних фільтрів
         fun bindFilters(filters: List<String>) {
             activeFiltersLayout.removeAllViews()
 
@@ -76,11 +81,11 @@ class BookAdapter(
                 filters.forEach { filterText ->
                     val filterView = TextView(context).apply {
                         text = filterText
-                        setTextColor(Color.parseColor("#F1EDE3"))
+                        setTextColor("#F1EDE3".toColorInt())
                         setPadding(20, 10, 20, 10)
-                        // Копия, чтоб не менять цвет других окон
+                        // створюємо фон з закругленими краями та кольором
                         val backgroundDrawable = ContextCompat.getDrawable(context, R.drawable.rounded_background)?.mutate()
-                        backgroundDrawable?.setTint(Color.parseColor("#95557E5A"))
+                        backgroundDrawable?.setTint("#95557E5A".toColorInt())
                         background = backgroundDrawable
                         textSize = 16f
                         typeface = ResourcesCompat.getFont(context, R.font.oswald_medium)
@@ -101,10 +106,12 @@ class BookAdapter(
 
     override fun getItemCount(): Int = books.size + 1
 
+    // визначаємо тип вью:
     override fun getItemViewType(position: Int): Int {
         return if (position == 0) VIEW_TYPE_HEADER else VIEW_TYPE_ITEM
     }
 
+    // створюємо ViewHolder залежно від типу
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
             VIEW_TYPE_HEADER -> {
@@ -121,19 +128,17 @@ class BookAdapter(
         }
     }
 
+    // заповнюємо ViewHolder
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         if (position == 0 && holder is HeaderViewHolder) {
             holder.bindFilters(activeFiltersList)
-            // кнопки и другие элементы, если нужно, тоже можно обновить
         } else if (holder is BookViewHolder) {
             val book = books[position - 1]
             holder.titleText.text = book.title
 
             val dateText = if (!book.endDate.isNullOrEmpty()) {
                 "${book.startDate} – ${book.endDate}"
-            } else {
-                book.startDate ?: ""
-            }
+            } else book.startDate
 
             holder.dateText.text = dateText
             holder.ratingText.text = "${book.rating}/10"
@@ -149,6 +154,7 @@ class BookAdapter(
         return FirebaseAuth.getInstance().currentUser != null
     }
 
+    // метод оновлення списку активних фільтрів та оновлення шапки RecyclerView
     fun updateActiveFilters(filters: List<String>) {
         activeFiltersList = filters
         notifyItemChanged(0)
